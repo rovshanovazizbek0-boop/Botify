@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.dashboard }} - BotFactory{% endblock %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" rel="preload" as="script">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">{{ t.dashboard }}</h1>
+                    <p class="text-muted mb-0">Welcome back, {{ current_user.username }}!</p>
+                </div>
+                <div>
+                    {% if current_user.can_create_bot() %}
+                    <a href="{{ url_for('dashboard.bot_create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>{{ t.create_bot }}
+                    </a>
+                    {% else %}
+                    <button class="btn btn-outline-secondary" disabled title="Upgrade to create more bots">
+                        <i class="fas fa-plus me-2"></i>{{ t.create_bot }}
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Status Alert -->
+    {% if not current_user.is_subscription_active() %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>{{ t.subscription_expired }}</strong>
+                <a href="#" class="btn btn-sm btn-outline-warning ms-2">{{ t.upgrade_subscription }}</a>
+            </div>
+        </div>
+    </div>
+    {% elif current_user.is_trial and current_user.days_until_expiry() <= 3 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-clock me-2"></i>
+                <strong>Trial ending soon!</strong> 
+                Your free trial expires in {{ current_user.days_until_expiry() }} days.
+                <a href="#" class="btn btn-sm btn-outline-info ms-2">{{ t.upgrade_subscription }}</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-primary">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">{{ t.my_bots }}</p>
+                            <h4 class="stats-number">{{ bots|length }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-success">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">{{ t.total_conversations }}</p>
+                            <h4 class="stats-number">{{ total_conversations }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-info">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">{{ t.total_messages }}</p>
+                            <h4 class="stats-number">{{ total_messages }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-warning">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">{{ t.days_remaining }}</p>
+                            <h4 class="stats-number">{{ current_user.days_until_expiry() }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bots List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ t.my_bots }}</h5>
+                    <span class="badge bg-secondary">{{ bots|length }} / 
+                        {% if current_user.subscription_type.value == 'free' %}1
+                        {% elif current_user.subscription_type.value == 'business' %}20
+                        {% else %}∞{% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if bots %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ t.bot_name }}</th>
+                                    <th>{{ t.bot_status }}</th>
+                                    <th>Conversations</th>
+                                    <th>Last Updated</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bot in bots %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bot-avatar me-3">
+                                                {% if bot.avatar_url %}
+                                                <img src="{{ bot.avatar_url }}" alt="{{ bot.name }}" class="rounded-circle" width="40" height="40">
+                                                {% else %}
+                                                <div class="avatar-placeholder">
+                                                    <i class="fas fa-robot"></i>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ bot.name }}</h6>
+                                                {% if bot.description %}
+                                                <small class="text-muted">{{ bot.description[:50] }}{% if bot.description|length > 50 %}...{% endif %}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if bot.is_active and bot.telegram_token %}
+                                        <span class="badge bg-success">{{ t.active }}</span>
+                                        {% elif bot.is_active %}
+                                        <span class="badge bg-warning">Not Configured</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ t.inactive }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ bot.conversations|length }}</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ bot.updated_at.strftime('%b %d, %Y') }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('dashboard.bot_settings', bot_id=bot.id) }}" 
+                                               class="btn btn-outline-primary" title="Settings">
+                                                <i class="fas fa-cog"></i>
+                                            </a>
+                                            <a href="{{ url_for('dashboard.analytics', bot_id=bot.id) }}" 
+                                               class="btn btn-outline-success" title="Analytics">
+                                                <i class="fas fa-chart-line"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-robot fa-3x text-muted mb-3"></i>
+                        <h5>No bots created yet</h5>
+                        <p class="text-muted mb-3">Create your first AI chatbot to get started</p>
+                        {% if current_user.can_create_bot() %}
+                        <a href="{{ url_for('dashboard.bot_create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>{{ t.create_bot }}
+                        </a>
+                        {% else %}
+                        <p class="text-warning"><i class="fas fa-lock me-2"></i>Upgrade subscription to create bots</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

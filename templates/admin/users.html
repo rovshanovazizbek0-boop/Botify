@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Admin - BotFactory{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">{{ t.user_management }}</h1>
+                    <p class="text-muted mb-0">Manage platform users and subscriptions</p>
+                </div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main') }}">{{ t.dashboard }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('admin.main') }}">{{ t.admin }}</a></li>
+                        <li class="breadcrumb-item active">{{ t.user_management }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Search Users</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Email or username..." id="searchUsers">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Subscription</label>
+                            <select class="form-select" id="filterSubscription">
+                                <option value="">All</option>
+                                <option value="free">Free</option>
+                                <option value="business">Business</option>
+                                <option value="enterprise">Enterprise</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="filterStatus">
+                                <option value="">All</option>
+                                <option value="active">Active</option>
+                                <option value="trial">Trial</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Language</label>
+                            <select class="form-select" id="filterLanguage">
+                                <option value="">All</option>
+                                <option value="en">English</option>
+                                <option value="ru">Russian</option>
+                                <option value="uz">Uzbek</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="btn-group w-100">
+                                <button class="btn btn-primary" onclick="applyFilters()">
+                                    <i class="fas fa-filter me-2"></i>Apply Filters
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-2"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Platform Users</h5>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-secondary me-3">
+                            Total: {{ users.total }} users
+                        </span>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="exportUsers()">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                            <button class="btn btn-outline-success" onclick="bulkAction()">
+                                <i class="fas fa-tasks me-1"></i>Bulk Action
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if users.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" class="form-check-input" id="selectAll">
+                                    </th>
+                                    <th>User</th>
+                                    <th>Subscription</th>
+                                    <th>Bots</th>
+                                    <th>Activity</th>
+                                    <th>Joined</th>
+                                    <th>Language</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users.items %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="form-check-input user-checkbox" value="{{ user.id }}">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">
+                                                <img src="https://ui-avatars.com/api/?name={{ user.username }}&size=40&background=007bff&color=fff" 
+                                                     alt="{{ user.username }}" class="rounded-circle" width="40" height="40">
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ user.username }}</h6>
+                                                <small class="text-muted">{{ user.email }}</small>
+                                                {% if user.is_admin %}
+                                                <span class="badge bg-danger ms-1" style="font-size: 0.7em;">Admin</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if user.subscription_type.value == 'free' %}bg-secondary
+                                            {% elif user.subscription_type.value == 'business' %}bg-primary
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ user.subscription_type.value.title() }}
+                                        </span>
+                                        {% if user.is_trial %}
+                                        <br><small class="text-info">Trial</small>
+                                        {% endif %}
+                                        
+                                        <br><small class="text-muted">
+                                            {% if user.is_subscription_active() %}
+                                            {{ user.days_until_expiry() }} days left
+                                            {% else %}
+                                            <span class="text-danger">Expired</span>
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ user.bots|length }}</span>
+                                        {% if user.bots %}
+                                        <br><small class="text-muted">
+                                            {{ user.bots|selectattr('is_active')|list|length }} active
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.last_login %}
+                                        <small class="text-muted">{{ user.last_login.strftime('%b %d') }}</small>
+                                        <br><small class="text-success">Active</small>
+                                        {% else %}
+                                        <small class="text-warning">Never logged in</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ user.created_at.strftime('%b %d, %Y') }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">
+                                            {% if user.language == 'en' %}EN
+                                            {% elif user.language == 'ru' %}RU
+                                            {% else %}UZ{% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" onclick="viewUser({{ user.id }})" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info" onclick="editUser({{ user.id }})" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            {% if not user.is_admin %}
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#" onclick="changeSubscription({{ user.id }})">Change Subscription</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="extendTrial({{ user.id }})">Extend Trial</a></li>
+                                                    <li><a class="dropdown-item" href="#" onclick="resetPassword({{ user.id }})">Reset Password</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-warning" href="#" onclick="suspendUser({{ user.id }})">Suspend User</a></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser({{ user.id }})">Delete User</a></li>
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if users.pages > 1 %}
+                    <nav aria-label="User pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if users.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.users', page=users.prev_num) }}">&laquo; Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for page_num in users.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != users.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.users', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                    {% endif %}
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if users.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.users', page=users.next_num) }}">Next &raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5>No users found</h5>
+                        <p class="text-muted">Try adjusting your search criteria</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Detail Modal -->
+<div class="modal fade" id="userDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userDetailContent">
+                <!-- User details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Action Modal -->
+<div class="modal fade" id="bulkActionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk Actions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Select Action</label>
+                    <select class="form-select" id="bulkActionType">
+                        <option value="">Choose action...</option>
+                        <option value="extend_trial">Extend Trial (7 days)</option>
+                        <option value="upgrade_subscription">Upgrade Subscription</option>
+                        <option value="send_email">Send Email</option>
+                        <option value="export_data">Export Selected Data</option>
+                    </select>
+                </div>
+                <div id="bulkActionOptions"></div>
+                <div class="alert alert-info">
+                    <span id="selectedCount">0</span> users selected
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="executeBulkAction()">Execute Action</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Select all functionality
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateSelectedCount();
+});
+
+// Update selected count
+document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', updateSelectedCount);
+});
+
+function updateSelectedCount() {
+    const selected = document.querySelectorAll('.user-checkbox:checked').length;
+    const countElement = document.getElementById('selectedCount');
+    if (countElement) {
+        countElement.textContent = selected;
+    }
+}
+
+function applyFilters() {
+    const search = document.getElementById('searchUsers').value;
+    const subscription = document.getElementById('filterSubscription').value;
+    const status = document.getElementById('filterStatus').value;
+    const language = document.getElementById('filterLanguage').value;
+    
+    // Build URL with filters
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (subscription) params.append('subscription', subscription);
+    if (status) params.append('status', status);
+    if (language) params.append('language', language);
+    
+    window.location.href = '{{ url_for("admin.users") }}?' + params.toString();
+}
+
+function clearFilters() {
+    window.location.href = '{{ url_for("admin.users") }}';
+}
+
+function viewUser(userId) {
+    // Load user details into modal
+    fetch(`/admin/user/${userId}/details`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('userDetailContent').innerHTML = html;
+            const modal = new bootstrap.Modal(document.getElementById('userDetailModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error loading user details:', error);
+            alert('Failed to load user details');
+        });
+}
+
+function editUser(userId) {
+    // Navigate to edit user page or open edit modal
+    alert(`Edit user ${userId} functionality would be implemented here`);
+}
+
+function changeSubscription(userId) {
+    const newSubscription = prompt('Enter new subscription type (free, business, enterprise):');
+    if (newSubscription && ['free', 'business', 'enterprise'].includes(newSubscription)) {
+        if (confirm(`Change subscription to ${newSubscription}?`)) {
+            alert(`Change subscription functionality would be implemented here`);
+        }
+    }
+}
+
+function extendTrial(userId) {
+    const days = prompt('Extend trial by how many days?', '7');
+    if (days && !isNaN(days) && parseInt(days) > 0) {
+        if (confirm(`Extend trial by ${days} days?`)) {
+            alert(`Extend trial functionality would be implemented here`);
+        }
+    }
+}
+
+function resetPassword(userId) {
+    if (confirm('Are you sure you want to reset this user\'s password? They will receive an email with instructions.')) {
+        alert(`Reset password functionality would be implemented here`);
+    }
+}
+
+function suspendUser(userId) {
+    if (confirm('Are you sure you want to suspend this user? They will not be able to access their account.')) {
+        alert(`Suspend user functionality would be implemented here`);
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone and will delete all their bots and data.')) {
+        if (confirm('This is permanent. Are you absolutely sure?')) {
+            alert(`Delete user functionality would be implemented here`);
+        }
+    }
+}
+
+function exportUsers() {
+    // Export users functionality
+    alert('Export users functionality would be implemented here');
+}
+
+function bulkAction() {
+    const selected = document.querySelectorAll('.user-checkbox:checked').length;
+    if (selected === 0) {
+        alert('Please select users first');
+        return;
+    }
+    
+    updateSelectedCount();
+    const modal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
+    modal.show();
+}
+
+function executeBulkAction() {
+    const actionType = document.getElementById('bulkActionType').value;
+    const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+    
+    if (!actionType) {
+        alert('Please select an action');
+        return;
+    }
+    
+    if (confirm(`Execute ${actionType} for ${selectedUsers.length} users?`)) {
+        alert(`Bulk action ${actionType} would be implemented here`);
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('bulkActionModal'));
+        modal.hide();
+    }
+}
+
+// Search on Enter key
+document.getElementById('searchUsers').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        applyFilters();
+    }
+});
+</script>
+{% endblock %}

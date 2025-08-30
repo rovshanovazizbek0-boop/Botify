@@ -1,0 +1,534 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Analytics - BotFactory{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Platform Analytics</h1>
+                    <p class="text-muted mb-0">Monitor platform performance and user engagement</p>
+                </div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main') }}">{{ t.dashboard }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('admin.main') }}">{{ t.admin }}</a></li>
+                        <li class="breadcrumb-item active">{{ t.analytics }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Total Users</p>
+                            <h4 class="stats-number">{{ total_users }}</h4>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>+15% this month
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-success">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Total Bots</p>
+                            <h4 class="stats-number">{{ total_bots }}</h4>
+                            <small class="text-info">
+                                {{ active_bots }} active
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-info">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Revenue</p>
+                            <h4 class="stats-number">${{ (business_users * 49) + (enterprise_users * 99) }}</h4>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>Monthly recurring
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-warning">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Growth Rate</p>
+                            <h4 class="stats-number">+23%</h4>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>User growth
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- User Growth Chart -->
+        <div class="col-lg-8 mb-3">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">User Growth & Revenue</h6>
+                    <div class="btn-group btn-group-sm">
+                        <input type="radio" class="btn-check" name="growthPeriod" id="month" checked>
+                        <label class="btn btn-outline-primary" for="month">Monthly</label>
+                        <input type="radio" class="btn-check" name="growthPeriod" id="quarter">
+                        <label class="btn btn-outline-primary" for="quarter">Quarterly</label>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="growthChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Subscription Distribution -->
+        <div class="col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Subscription Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="subscriptionChart" height="300"></canvas>
+                    <div class="subscription-stats mt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Free Users:</span>
+                            <span class="fw-bold">{{ free_users }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Business Users:</span>
+                            <span class="fw-bold text-primary">{{ business_users }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Enterprise Users:</span>
+                            <span class="fw-bold text-warning">{{ enterprise_users }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analytics Row -->
+    <div class="row mb-4">
+        <!-- Platform Health -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Platform Health</h6>
+                </div>
+                <div class="card-body">
+                    <div class="health-metric mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">System Uptime</span>
+                            <span class="fw-bold text-success">99.8%</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: 99.8%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="health-metric mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">API Response Time</span>
+                            <span class="fw-bold text-info">245ms</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-info" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="health-metric mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">Database Performance</span>
+                            <span class="fw-bold text-primary">Excellent</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="health-metric">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">Storage Usage</span>
+                            <span class="fw-bold text-warning">67%</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-warning" style="width: 67%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Performing Bots -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Top Performing Bots</h6>
+                </div>
+                <div class="card-body">
+                    <div class="bot-ranking">
+                        <div class="ranking-item d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="ranking-number me-3">1</span>
+                                <div>
+                                    <h6 class="mb-0">Customer Support Bot</h6>
+                                    <small class="text-muted">Business Plan User</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">1,247</div>
+                                <small class="text-muted">conversations</small>
+                            </div>
+                        </div>
+                        
+                        <div class="ranking-item d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="ranking-number me-3">2</span>
+                                <div>
+                                    <h6 class="mb-0">Sales Assistant</h6>
+                                    <small class="text-muted">Enterprise Plan User</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">892</div>
+                                <small class="text-muted">conversations</small>
+                            </div>
+                        </div>
+                        
+                        <div class="ranking-item d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="ranking-number me-3">3</span>
+                                <div>
+                                    <h6 class="mb-0">FAQ Helper</h6>
+                                    <small class="text-muted">Business Plan User</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">634</div>
+                                <small class="text-muted">conversations</small>
+                            </div>
+                        </div>
+                        
+                        <div class="ranking-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="ranking-number me-3">4</span>
+                                <div>
+                                    <h6 class="mb-0">Product Advisor</h6>
+                                    <small class="text-muted">Free Plan User</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-success">421</div>
+                                <small class="text-muted">conversations</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geographic Distribution & Usage Patterns -->
+    <div class="row">
+        <!-- Geographic Distribution -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Geographic Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="geo-stats">
+                        <div class="geo-item d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="flag-icon me-3">🇺🇿</span>
+                                <span>Uzbekistan</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">{{ (total_users * 0.45)|int }}</span>
+                                <div class="progress mt-1" style="width: 100px; height: 4px;">
+                                    <div class="progress-bar bg-primary" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="geo-item d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="flag-icon me-3">🇷🇺</span>
+                                <span>Russia</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">{{ (total_users * 0.30)|int }}</span>
+                                <div class="progress mt-1" style="width: 100px; height: 4px;">
+                                    <div class="progress-bar bg-success" style="width: 30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="geo-item d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="flag-icon me-3">🇺🇸</span>
+                                <span>United States</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">{{ (total_users * 0.15)|int }}</span>
+                                <div class="progress mt-1" style="width: 100px; height: 4px;">
+                                    <div class="progress-bar bg-info" style="width: 15%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="geo-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="flag-icon me-3">🌍</span>
+                                <span>Other Countries</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">{{ (total_users * 0.10)|int }}</span>
+                                <div class="progress mt-1" style="width: 100px; height: 4px;">
+                                    <div class="progress-bar bg-secondary" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Patterns -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Usage Patterns</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="usageChart" height="200"></canvas>
+                    
+                    <div class="usage-insights mt-3">
+                        <div class="insight-item mb-2">
+                            <i class="fas fa-clock text-info me-2"></i>
+                            <span class="small">Peak usage: 2:00 PM - 4:00 PM</span>
+                        </div>
+                        <div class="insight-item mb-2">
+                            <i class="fas fa-calendar text-success me-2"></i>
+                            <span class="small">Most active day: Wednesday</span>
+                        </div>
+                        <div class="insight-item">
+                            <i class="fas fa-mobile-alt text-primary me-2"></i>
+                            <span class="small">68% of traffic from mobile devices</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Items -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Action Items & Recommendations</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="action-item text-center mb-3">
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                <h6>Server Capacity</h6>
+                                <p class="small text-muted">Consider upgrading server capacity as usage approaches 80%</p>
+                                <button class="btn btn-outline-warning btn-sm">Review Capacity</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="action-item text-center mb-3">
+                                <i class="fas fa-bullhorn fa-2x text-info mb-2"></i>
+                                <h6>Marketing Opportunity</h6>
+                                <p class="small text-muted">High engagement in afternoon hours - perfect for promotions</p>
+                                <button class="btn btn-outline-info btn-sm">Create Campaign</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="action-item text-center mb-3">
+                                <i class="fas fa-users fa-2x text-success mb-2"></i>
+                                <h6>User Retention</h6>
+                                <p class="small text-muted">Implement user onboarding improvements for better retention</p>
+                                <button class="btn btn-outline-success btn-sm">Improve Onboarding</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// User Growth Chart
+const growthCtx = document.getElementById('growthChart').getContext('2d');
+const growthChart = new Chart(growthCtx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+            label: 'New Users',
+            data: [12, 19, 23, 31, 45, 67, 89, 134, 167, 203, 251, 289],
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            tension: 0.4,
+            yAxisID: 'y'
+        }, {
+            label: 'Revenue ($)',
+            data: [500, 800, 1200, 1800, 2400, 3200, 4100, 5300, 6800, 8200, 9900, 11500],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+            tension: 0.4,
+            yAxisID: 'y1'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: {
+                    drawOnChartArea: false,
+                },
+            }
+        }
+    }
+});
+
+// Subscription Distribution Chart
+const subscriptionCtx = document.getElementById('subscriptionChart').getContext('2d');
+const subscriptionChart = new Chart(subscriptionCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Free Users', 'Business Users', 'Enterprise Users'],
+        datasets: [{
+            data: [{{ free_users }}, {{ business_users }}, {{ enterprise_users }}],
+            backgroundColor: [
+                'rgb(108, 117, 125)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 193, 7)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+
+// Usage Patterns Chart
+const usageCtx = document.getElementById('usageChart').getContext('2d');
+const usageChart = new Chart(usageCtx, {
+    type: 'bar',
+    data: {
+        labels: ['12AM', '4AM', '8AM', '12PM', '4PM', '8PM'],
+        datasets: [{
+            label: 'Active Users',
+            data: [45, 23, 89, 167, 234, 156],
+            backgroundColor: 'rgba(54, 162, 235, 0.8)'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Period toggle functionality
+document.querySelectorAll('input[name="growthPeriod"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        if (this.id === 'quarter') {
+            // Update chart to show quarterly data
+            growthChart.data.labels = ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'];
+            growthChart.data.datasets[0].data = [54, 156, 267, 356];
+            growthChart.data.datasets[1].data = [2400, 7200, 14800, 22400];
+        } else {
+            // Show monthly data
+            growthChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            growthChart.data.datasets[0].data = [12, 19, 23, 31, 45, 67, 89, 134, 167, 203, 251, 289];
+            growthChart.data.datasets[1].data = [500, 800, 1200, 1800, 2400, 3200, 4100, 5300, 6800, 8200, 9900, 11500];
+        }
+        growthChart.update();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.create_bot }} - BotFactory{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main') }}">{{ t.dashboard }}</a></li>
+                        <li class="breadcrumb-item active">{{ t.create_bot }}</li>
+                    </ol>
+                </nav>
+                <h1 class="h3">{{ t.create_bot }}</h1>
+                <p class="text-muted">Create a new AI-powered chatbot for your business</p>
+            </div>
+
+            <!-- Bot Creation Form -->
+            <div class="card">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h5 class="card-title">Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">{{ t.bot_name }} *</label>
+                                        {{ form.name(class="form-control form-control-lg") }}
+                                        {% for error in form.name.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
+                                        <div class="form-text">Choose a memorable name for your bot</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <div class="bot-avatar-preview mb-2">
+                                            <i class="fas fa-robot fa-3x text-muted"></i>
+                                        </div>
+                                        <small class="text-muted">Bot Avatar</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">{{ t.bot_description }}</label>
+                                {{ form.description(class="form-control", rows="3") }}
+                                {% for error in form.description.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                                <div class="form-text">Describe what your bot does and how it can help users</div>
+                            </div>
+                        </div>
+
+                        <!-- AI Configuration -->
+                        <div class="mb-4">
+                            <h5 class="card-title">AI Configuration</h5>
+                            
+                            <div class="mb-3">
+                                <label for="system_prompt" class="form-label">{{ t.system_prompt }}</label>
+                                {{ form.system_prompt(class="form-control", rows="4") }}
+                                {% for error in form.system_prompt.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                                <div class="form-text">Define your bot's personality and behavior. This helps the AI understand its role.</div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="temperature" class="form-label">{{ t.temperature }}</label>
+                                        {{ form.temperature(class="form-control", step="0.1") }}
+                                        {% for error in form.temperature.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
+                                        <div class="form-text">Controls creativity (0.0 = focused, 2.0 = creative)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="max_tokens" class="form-label">{{ t.max_tokens }}</label>
+                                        {{ form.max_tokens(class="form-control") }}
+                                        {% for error in form.max_tokens.errors %}
+                                            <div class="text-danger small">{{ error }}</div>
+                                        {% endfor %}
+                                        <div class="form-text">Maximum response length (tokens)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subscription Limits Info -->
+                        <div class="alert alert-info" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>Subscription Limits
+                            </h6>
+                            <p class="mb-0">
+                                {% if current_user.subscription_type.value == 'free' %}
+                                <strong>Free Plan:</strong> You can create 1 bot with basic features.
+                                <a href="#" class="alert-link">Upgrade to create more bots</a>.
+                                {% elif current_user.subscription_type.value == 'business' %}
+                                <strong>Business Plan:</strong> You can create up to 20 bots with full features.
+                                {% else %}
+                                <strong>Enterprise Plan:</strong> Unlimited bots with advanced AI features.
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard.main') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                            {{ form.submit(class="btn btn-primary btn-lg px-4") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Next Steps Info -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6 class="card-title">What happens next?</h6>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-cog fa-2x text-primary mb-2"></i>
+                            <h6>Configure Settings</h6>
+                            <small class="text-muted">Add Telegram token and customize your bot</small>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-book fa-2x text-success mb-2"></i>
+                            <h6>Add Knowledge Base</h6>
+                            <small class="text-muted">Upload documents or add content for your bot to learn</small>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-rocket fa-2x text-warning mb-2"></i>
+                            <h6>Deploy & Test</h6>
+                            <small class="text-muted">Start chatting with your bot and monitor analytics</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Real-time character count for description
+document.getElementById('description').addEventListener('input', function() {
+    const maxLength = 500;
+    const currentLength = this.value.length;
+    const remaining = maxLength - currentLength;
+    
+    // You can add character count display here
+});
+
+// Temperature slider preview
+document.getElementById('temperature').addEventListener('input', function() {
+    const value = parseFloat(this.value);
+    let description = '';
+    
+    if (value <= 0.3) {
+        description = 'Very focused and deterministic responses';
+    } else if (value <= 0.7) {
+        description = 'Balanced between creativity and consistency';
+    } else if (value <= 1.0) {
+        description = 'Creative and varied responses';
+    } else {
+        description = 'Very creative and unpredictable responses';
+    }
+    
+    // Update description text
+    const helpText = this.parentElement.querySelector('.form-text');
+    if (helpText) {
+        helpText.textContent = `Controls creativity (${value}) - ${description}`;
+    }
+});
+</script>
+{% endblock %}

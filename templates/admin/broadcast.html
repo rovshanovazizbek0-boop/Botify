@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Broadcast Messages - Admin - BotFactory{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">{{ t.broadcast_message }}</h1>
+                    <p class="text-muted mb-0">Send messages to targeted user groups</p>
+                </div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main') }}">{{ t.dashboard }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('admin.main') }}">{{ t.admin }}</a></li>
+                        <li class="breadcrumb-item active">{{ t.broadcast_message }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Broadcast Form -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Create New Broadcast</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">{{ t.broadcast_title }}</label>
+                            {{ form.title(class="form-control form-control-lg") }}
+                            {% for error in form.title.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="target_subscription" class="form-label">{{ t.target_users }}</label>
+                            {{ form.target_subscription(class="form-select") }}
+                            {% for error in form.target_subscription.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Select which user group to target</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">{{ t.broadcast_content }}</label>
+                            {{ form.content(class="form-control", rows="6") }}
+                            {% for error in form.content.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Plain text content that will be sent to all targeted users</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="html_content" class="form-label">HTML Content (Optional)</label>
+                            {{ form.html_content(class="form-control", rows="8") }}
+                            {% for error in form.html_content.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">HTML formatted content for rich text messages (will override plain text)</div>
+                        </div>
+                        
+                        <!-- Message Preview -->
+                        <div class="mb-4">
+                            <h6>Message Preview</h6>
+                            <div class="card border-secondary">
+                                <div class="card-body bg-light">
+                                    <div class="message-preview" id="messagePreview">
+                                        <div class="d-flex">
+                                            <div class="bot-avatar me-3">
+                                                <i class="fas fa-robot fa-2x text-primary"></i>
+                                            </div>
+                                            <div class="message-bubble">
+                                                <div class="preview-content">Type your message above to see preview...</div>
+                                                <small class="text-muted">BotFactory Admin • Now</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="send-options">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="scheduleMessage">
+                                    <label class="form-check-label" for="scheduleMessage">
+                                        Schedule for later
+                                    </label>
+                                </div>
+                                <div class="mt-2 d-none" id="scheduleOptions">
+                                    <input type="datetime-local" class="form-control" id="scheduleDateTime">
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary me-2" onclick="saveDraft()">
+                                    <i class="fas fa-save me-2"></i>Save Draft
+                                </button>
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Target Audience Info -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Target Audience</h6>
+                </div>
+                <div class="card-body">
+                    <div class="audience-stats" id="audienceStats">
+                        <div class="stat-item d-flex justify-content-between mb-2">
+                            <span class="text-muted">Free Users:</span>
+                            <span class="fw-bold" id="freeUserCount">-</span>
+                        </div>
+                        <div class="stat-item d-flex justify-content-between mb-2">
+                            <span class="text-muted">Business Users:</span>
+                            <span class="fw-bold" id="businessUserCount">-</span>
+                        </div>
+                        <div class="stat-item d-flex justify-content-between mb-2">
+                            <span class="text-muted">Enterprise Users:</span>
+                            <span class="fw-bold" id="enterpriseUserCount">-</span>
+                        </div>
+                        <hr>
+                        <div class="stat-item d-flex justify-content-between">
+                            <span class="text-muted">Total Recipients:</span>
+                            <span class="fw-bold text-primary" id="totalRecipients">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Templates -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Quick Templates</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="useTemplate('welcome')">
+                            <i class="fas fa-hand-wave me-2"></i>Welcome Message
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="useTemplate('upgrade')">
+                            <i class="fas fa-crown me-2"></i>Upgrade Promotion
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="useTemplate('feature')">
+                            <i class="fas fa-star me-2"></i>New Feature Announcement
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="useTemplate('maintenance')">
+                            <i class="fas fa-tools me-2"></i>Maintenance Notice
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Practices -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Best Practices</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Keep messages concise and valuable
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Include clear call-to-action
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Test with small group first
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Respect user preferences
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            Avoid too frequent messaging
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Broadcasts -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Broadcasts</h5>
+                </div>
+                <div class="card-body">
+                    {% if broadcasts %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ t.title }}</th>
+                                    <th>Target</th>
+                                    <th>Recipients</th>
+                                    <th>Delivered</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for broadcast in broadcasts %}
+                                <tr>
+                                    <td>
+                                        <h6 class="mb-1">{{ broadcast.title }}</h6>
+                                        <small class="text-muted">{{ broadcast.content[:60] }}{% if broadcast.content|length > 60 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if broadcast.target_subscription.value == 'free' %}bg-secondary
+                                            {% elif broadcast.target_subscription.value == 'business' %}bg-primary  
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ broadcast.target_subscription.value.title() }} Users
+                                        </span>
+                                    </td>
+                                    <td>{{ broadcast.logs|length }}</td>
+                                    <td>
+                                        {% set delivered = broadcast.logs|selectattr('is_delivered')|list|length %}
+                                        {% set total = broadcast.logs|length %}
+                                        {{ delivered }}/{{ total }}
+                                        {% if total > 0 %}
+                                        <small class="text-muted">({{ "%.1f"|format((delivered/total)*100) }}%)</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {% if broadcast.sent_at %}
+                                            {{ broadcast.sent_at.strftime('%b %d, %Y %H:%M') }}
+                                            {% else %}
+                                            {{ broadcast.created_at.strftime('%b %d, %Y %H:%M') }}
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if broadcast.is_sent %}
+                                        <span class="badge bg-success">Sent</span>
+                                        {% elif broadcast.scheduled_at %}
+                                        <span class="badge bg-info">Scheduled</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Draft</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" onclick="viewBroadcast({{ broadcast.id }})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            {% if not broadcast.is_sent %}
+                                            <button class="btn btn-outline-success" onclick="sendBroadcast({{ broadcast.id }})">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn btn-outline-info" onclick="cloneBroadcast({{ broadcast.id }})">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                        <h6>No broadcasts sent yet</h6>
+                        <p class="text-muted">Create your first broadcast message above</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>
+// Mock user counts - in real app, these would be fetched from API
+const userCounts = {
+    free: 150,
+    business: 45,
+    enterprise: 12
+};
+
+// Update audience stats based on selection
+document.getElementById('target_subscription').addEventListener('change', function() {
+    updateAudienceStats(this.value);
+});
+
+function updateAudienceStats(target) {
+    document.getElementById('freeUserCount').textContent = userCounts.free;
+    document.getElementById('businessUserCount').textContent = userCounts.business;
+    document.getElementById('enterpriseUserCount').textContent = userCounts.enterprise;
+    
+    let total = 0;
+    if (target === 'free') {
+        total = userCounts.free;
+    } else if (target === 'business') {
+        total = userCounts.business;
+    } else if (target === 'enterprise') {
+        total = userCounts.enterprise;
+    }
+    
+    document.getElementById('totalRecipients').textContent = total;
+}
+
+// Message preview
+function updatePreview() {
+    const content = document.getElementById('content').value;
+    const htmlContent = document.getElementById('html_content').value;
+    const previewContent = document.querySelector('.preview-content');
+    
+    if (htmlContent.trim()) {
+        previewContent.innerHTML = htmlContent;
+    } else if (content.trim()) {
+        previewContent.textContent = content;
+    } else {
+        previewContent.textContent = 'Type your message above to see preview...';
+    }
+}
+
+// Update preview on input
+document.getElementById('content').addEventListener('input', updatePreview);
+document.getElementById('html_content').addEventListener('input', updatePreview);
+
+// Schedule toggle
+document.getElementById('scheduleMessage').addEventListener('change', function() {
+    const scheduleOptions = document.getElementById('scheduleOptions');
+    if (this.checked) {
+        scheduleOptions.classList.remove('d-none');
+    } else {
+        scheduleOptions.classList.add('d-none');
+    }
+});
+
+// Template functions
+function useTemplate(type) {
+    const templates = {
+        welcome: {
+            title: 'Welcome to BotFactory!',
+            content: 'Thank you for joining BotFactory! 🎉\n\nYour 14-day free trial has started. Create your first AI chatbot and discover the power of automated conversations.\n\nNeed help getting started? Check out our quick start guide or contact support.\n\nHappy bot building!'
+        },
+        upgrade: {
+            title: 'Upgrade Your BotFactory Experience',
+            content: '🚀 Ready to take your chatbots to the next level?\n\nUpgrade to Business or Enterprise plan and unlock:\n• Unlimited messages\n• Advanced analytics\n• Multi-channel support\n• Priority support\n\nSpecial offer: Use code UPGRADE20 for 20% off your first month!\n\n[Upgrade Now]'
+        },
+        feature: {
+            title: 'New Feature: Advanced Analytics Dashboard',
+            content: '📊 Exciting news! We\'ve just launched our new Advanced Analytics Dashboard!\n\nNew features include:\n• Real-time conversation insights\n• User behavior tracking\n• Performance metrics\n• Custom reports\n\nAvailable now for Business and Enterprise users. Check it out in your dashboard!'
+        },
+        maintenance: {
+            title: 'Scheduled Maintenance Notice',
+            content: '🔧 Scheduled Maintenance Notice\n\nWe\'ll be performing system maintenance on [DATE] from [TIME] to [TIME].\n\nDuring this time:\n• Chatbots will continue working normally\n• Dashboard may be temporarily unavailable\n• No data will be lost\n\nWe apologize for any inconvenience. Thank you for your patience!'
+        }
+    };
+    
+    if (templates[type]) {
+        document.getElementById('title').value = templates[type].title;
+        document.getElementById('content').value = templates[type].content;
+        updatePreview();
+    }
+}
+
+function saveDraft() {
+    alert('Save draft functionality would be implemented here');
+}
+
+function viewBroadcast(id) {
+    alert(`View broadcast ${id} details`);
+}
+
+function sendBroadcast(id) {
+    if (confirm('Are you sure you want to send this broadcast?')) {
+        alert(`Send broadcast ${id} functionality would be implemented here`);
+    }
+}
+
+function cloneBroadcast(id) {
+    alert(`Clone broadcast ${id} functionality would be implemented here`);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    updateAudienceStats('free');
+});
+</script>
+{% endblock %}

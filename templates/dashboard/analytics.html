@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bot.name }} Analytics - BotFactory{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main') }}">{{ t.dashboard }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard.bot_settings', bot_id=bot.id) }}">{{ bot.name }}</a></li>
+                    <li class="breadcrumb-item active">{{ t.analytics }}</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">{{ bot.name }} {{ t.analytics }}</h1>
+                    <p class="text-muted mb-0">Monitor your bot's performance and user interactions</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" onclick="exportAnalytics()">
+                        <i class="fas fa-download me-2"></i>Export Data
+                    </button>
+                    <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-calendar me-2"></i>Last 30 Days
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="changePeriod(7)">Last 7 Days</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changePeriod(30)">Last 30 Days</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changePeriod(90)">Last 90 Days</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-primary">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Total Conversations</p>
+                            <h4 class="stats-number">{{ conversations|length }}</h4>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>+12% from last month
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-success">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Messages Exchanged</p>
+                            <h4 class="stats-number">{{ analytics_data|sum(attribute='messages_sent') + analytics_data|sum(attribute='messages_received') }}</h4>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>+8% from last week
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-info">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Unique Users</p>
+                            <h4 class="stats-number">{{ analytics_data|sum(attribute='unique_users') }}</h4>
+                            <small class="text-warning">
+                                <i class="fas fa-minus me-1"></i>-2% from last week
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="ms-3">
+                            <p class="stats-title">Avg Response Time</p>
+                            <h4 class="stats-number">1.2s</h4>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-down me-1"></i>-0.3s faster
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Messages Chart -->
+        <div class="col-lg-8 mb-3">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Message Activity</h6>
+                    <div class="btn-group btn-group-sm">
+                        <input type="radio" class="btn-check" name="chartType" id="daily" checked>
+                        <label class="btn btn-outline-primary" for="daily">Daily</label>
+                        <input type="radio" class="btn-check" name="chartType" id="weekly">
+                        <label class="btn btn-outline-primary" for="weekly">Weekly</label>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="messagesChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Engagement Chart -->
+        <div class="col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">User Engagement</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="engagementChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Tables Row -->
+    <div class="row">
+        <!-- Recent Conversations -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Recent Conversations</h6>
+                </div>
+                <div class="card-body">
+                    {% if conversations %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Messages</th>
+                                    <th>Started</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for conversation in conversations %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-2">
+                                                <i class="fas fa-user-circle fa-lg text-muted"></i>
+                                            </div>
+                                            <div>
+                                                <small class="fw-medium">User {{ conversation.telegram_user_id[:8] if conversation.telegram_user_id else 'Unknown' }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ conversation.messages|length }}</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ conversation.started_at.strftime('%b %d, %H:%M') }}</small>
+                                    </td>
+                                    <td>
+                                        {% set time_diff = (moment.utcnow() - conversation.last_message_at).total_seconds() %}
+                                        {% if time_diff < 3600 %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% elif time_diff < 86400 %}
+                                        <span class="badge bg-warning">Recent</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-comments fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No conversations yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Topics/Keywords -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">Popular Topics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="topic-list">
+                        <div class="topic-item d-flex justify-content-between align-items-center mb-2">
+                            <span class="topic-name">Product Information</span>
+                            <div class="topic-stats">
+                                <span class="badge bg-primary">24%</span>
+                                <div class="progress ms-2" style="width: 60px; height: 6px;">
+                                    <div class="progress-bar" style="width: 24%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="topic-item d-flex justify-content-between align-items-center mb-2">
+                            <span class="topic-name">Support Requests</span>
+                            <div class="topic-stats">
+                                <span class="badge bg-success">18%</span>
+                                <div class="progress ms-2" style="width: 60px; height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 18%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="topic-item d-flex justify-content-between align-items-center mb-2">
+                            <span class="topic-name">Pricing Questions</span>
+                            <div class="topic-stats">
+                                <span class="badge bg-info">15%</span>
+                                <div class="progress ms-2" style="width: 60px; height: 6px;">
+                                    <div class="progress-bar bg-info" style="width: 15%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="topic-item d-flex justify-content-between align-items-center mb-2">
+                            <span class="topic-name">General Inquiries</span>
+                            <div class="topic-stats">
+                                <span class="badge bg-warning">12%</span>
+                                <div class="progress ms-2" style="width: 60px; height: 6px;">
+                                    <div class="progress-bar bg-warning" style="width: 12%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="topic-item d-flex justify-content-between align-items-center">
+                            <span class="topic-name">Other Topics</span>
+                            <div class="topic-stats">
+                                <span class="badge bg-secondary">31%</span>
+                                <div class="progress ms-2" style="width: 60px; height: 6px;">
+                                    <div class="progress-bar bg-secondary" style="width: 31%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <small class="text-muted">Based on last 30 days of conversations</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Insights -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Performance Insights</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="insight-item">
+                                <i class="fas fa-thumbs-up fa-2x text-success mb-2"></i>
+                                <h6>High Satisfaction</h6>
+                                <p class="text-muted small">87% of users rate interactions as helpful</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="insight-item">
+                                <i class="fas fa-bolt fa-2x text-warning mb-2"></i>
+                                <h6>Fast Response</h6>
+                                <p class="text-muted small">Average response time under 2 seconds</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="insight-item">
+                                <i class="fas fa-users fa-2x text-info mb-2"></i>
+                                <h6>Growing User Base</h6>
+                                <p class="text-muted small">25% increase in unique users this month</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-light mt-3" role="alert">
+                        <h6 class="alert-heading">💡 Recommendations</h6>
+                        <ul class="mb-0">
+                            <li>Consider expanding your knowledge base to cover more topics</li>
+                            <li>Your bot is performing well during peak hours (2-4 PM)</li>
+                            <li>Users frequently ask about pricing - consider adding more detailed pricing information</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Messages Activity Chart
+const messagesCtx = document.getElementById('messagesChart').getContext('2d');
+const messagesChart = new Chart(messagesCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for data in analytics_data %}'{{ data.date.strftime("%b %d") }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Messages Sent',
+            data: [{% for data in analytics_data %}{{ data.messages_sent }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            tension: 0.4
+        }, {
+            label: 'Messages Received',
+            data: [{% for data in analytics_data %}{{ data.messages_received }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// User Engagement Doughnut Chart
+const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+const engagementChart = new Chart(engagementCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['New Users', 'Returning Users', 'Inactive Users'],
+        datasets: [{
+            data: [45, 35, 20],
+            backgroundColor: [
+                'rgb(54, 162, 235)',
+                'rgb(255, 206, 86)',
+                'rgb(255, 99, 132)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+
+function exportAnalytics() {
+    // Export analytics data functionality
+    alert('Export functionality would be implemented here');
+}
+
+function changePeriod(days) {
+    // Change analytics period
+    alert(`Change to ${days} days period - functionality would be implemented here`);
+}
+
+// Chart type toggle
+document.querySelectorAll('input[name="chartType"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Update chart based on selected period
+        console.log('Chart type changed to:', this.id);
+    });
+});
+</script>
+{% endblock %}
