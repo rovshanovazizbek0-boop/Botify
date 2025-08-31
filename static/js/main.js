@@ -268,7 +268,7 @@
             link.addEventListener('click', function(e) {
                 const href = link.getAttribute('href');
                 
-                if (href === '#') {
+                if (href === '#' || !href || href.trim() === '') {
                     return;
                 }
                 
