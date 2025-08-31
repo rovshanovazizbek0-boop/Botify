@@ -1,11 +1,15 @@
 import os
 import logging
+import sys
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
+
+# Ensure UTF-8 encoding
+os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -20,12 +24,28 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///botfactory.db")
+# Configure the database with UTF-8 support
+database_url = os.environ.get("DATABASE_URL", "sqlite:///botfactory.db")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
+    "echo": False,
 }
+
+# Configure SQLite for UTF-8 support
+if database_url.startswith('sqlite'):
+    from sqlalchemy import event
+    from sqlalchemy.engine import Engine
+    
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        if 'sqlite' in str(type(dbapi_connection)):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA encoding = 'UTF-8'")
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize extensions

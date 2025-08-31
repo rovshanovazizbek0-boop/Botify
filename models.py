@@ -43,10 +43,11 @@ class User(UserMixin, db.Model):
     def can_create_bot(self):
         if not self.is_subscription_active():
             return False
+        bot_count = len(self.bots.all())
         if self.subscription_type == SubscriptionType.FREE:
-            return len(self.bots) < 1
+            return bot_count < 1
         elif self.subscription_type == SubscriptionType.BUSINESS:
-            return len(self.bots) < 20
+            return bot_count < 20
         else:  # ENTERPRISE
             return True
 
