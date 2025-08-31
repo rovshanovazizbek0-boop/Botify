@@ -197,6 +197,21 @@
     animation: float 15s ease-in-out infinite reverse;
 }
 
+/* Disable all floating animations */
+.hero-premium::before,
+.hero-robot-premium,
+.cta-section-premium::before,
+div[style*="animation: float"] {
+    animation: none !important;
+}
+
+/* Fixed position for buttons */
+.buttons a, .buttons button {
+    position: relative !important;
+    transform: none !important;
+    animation: none !important;
+}
+
 @media (max-width: 768px) {
     .hero-title-premium {
         font-size: 2.5rem;
@@ -249,7 +264,8 @@
     <div class="container-premium">
         <div class="hero" style="text-align: center; margin-top: 40px;">
             <div class="buttons" style="margin-bottom: 40px;">
-                <button class="btn primary" style="
+                <a href="{{ url_for('auth.register') }}" class="btn primary" style="
+                    display: inline-block;
                     padding: 12px 24px;
                     border: none;
                     border-radius: 12px;
@@ -258,8 +274,13 @@
                     margin: 5px;
                     color: #fff;
                     background: linear-gradient(90deg, #4A90E2, #9013FE);
-                ">🚀 Bepul Boshlash</button>
-                <button class="btn secondary" style="
+                    text-decoration: none;
+                    position: relative;
+                    transform: none !important;
+                    transition: box-shadow 0.3s ease, filter 0.3s ease;
+                ">🚀 Bepul Boshlash</a>
+                <a href="#features" class="btn secondary" style="
+                    display: inline-block;
                     padding: 12px 24px;
                     border: none;
                     border-radius: 12px;
@@ -268,7 +289,11 @@
                     margin: 5px;
                     color: #fff;
                     background: linear-gradient(90deg, #bd83f7, #d1a6ff);
-                ">▶ Ko'proq Ma'lumot</button>
+                    text-decoration: none;
+                    position: relative;
+                    transform: none !important;
+                    transition: box-shadow 0.3s ease, filter 0.3s ease;
+                ">▶ Ko'proq Ma'lumot</a>
             </div>
         </div>
 
@@ -491,15 +516,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Parallax effect for hero section
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        const heroSection = document.querySelector('.hero-premium');
-        
-        if (heroSection) {
-            heroSection.style.transform = `translateY(${scrolled * 0.5}px)`;
-        }
-    });
+    // Parallax effect disabled to prevent button movement
+    // window.addEventListener('scroll', function() {
+    //     const scrolled = window.pageYOffset;
+    //     const heroSection = document.querySelector('.hero-premium');
+    //     
+    //     if (heroSection) {
+    //         heroSection.style.transform = `translateY(${scrolled * 0.5}px)`;
+    //     }
+    // });
 
     // Add premium interactions
     const premiumCards = document.querySelectorAll('.feature-item-premium, .pricing-card-premium');
