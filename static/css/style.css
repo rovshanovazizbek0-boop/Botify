@@ -125,6 +125,7 @@ body {
     margin: 0 auto;
     max-width: 100%;
     position: relative;
+    overflow-x: hidden;
 }
 
 @media (min-width: 768px) {
@@ -152,12 +153,13 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
-    z-index: 1000;
+    z-index: 1001;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--space-lg);
     transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .app-header.scrolled {
@@ -690,10 +692,32 @@ body {
 .mobile-app {
     padding-bottom: var(--bottom-nav-height);
     min-height: 100vh;
+    position: relative;
 }
 
 .mobile-app.has-header {
-    padding-top: var(--header-height);
+    padding-top: calc(var(--header-height) + var(--space-lg));
+}
+
+/* Fix overlapping content */
+main {
+    position: relative;
+    z-index: 1;
+    padding-top: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+    .mobile-app {
+        padding-bottom: calc(var(--bottom-nav-height) + var(--space-md));
+    }
+    
+    .mobile-app.has-header {
+        padding-top: calc(var(--header-height) + var(--space-xl));
+    }
+    
+    main {
+        padding-top: var(--space-xl);
+    }
 }
 
 /* Loading States */

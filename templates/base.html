@@ -21,10 +21,10 @@
     
     {% block head %}{% endblock %}
 </head>
-<body class="mobile-app">
+<body class="mobile-app{% if current_user.is_authenticated %} has-header{% endif %}">
     <!-- Premium Mobile Header -->
     {% if current_user.is_authenticated %}
-    <header class="app-header has-header">
+    <header class="app-header">
         <a href="{{ url_for('dashboard.main') }}" class="header-brand">
             <i class="fas fa-robot"></i>
             BotFactory
