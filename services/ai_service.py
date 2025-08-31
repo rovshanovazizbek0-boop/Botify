@@ -5,7 +5,7 @@ from google.genai import types
 
 class AIService:
     def __init__(self):
-        self.client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "default-key"))
+        self.client = genai.Client(api_key=os.environ.get("GOOGLE_GENAI_API_KEY"))
         self.model = "gemini-2.5-flash"
     
     def generate_response(self, user_message, context="", system_prompt="You are a helpful assistant."):
