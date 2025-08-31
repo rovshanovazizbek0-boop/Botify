@@ -322,12 +322,12 @@
 </div>
 
 <!-- Add Knowledge Modal -->
-<div class="modal fade" id="addKnowledgeModal" tabindex="-1">
+<div class="modal fade" id="addKnowledgeModal" tabindex="-1" aria-labelledby="addKnowledgeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content" style="z-index: 1070;">
             <div class="modal-header">
-                <h5 class="modal-title">{{ t.add_knowledge }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="addKnowledgeModalLabel">{{ t.add_knowledge }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1080;"></button>
             </div>
             <form method="POST" enctype="multipart/form-data">
                 {{ kb_form.hidden_tag() }}
@@ -359,8 +359,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t.cancel }}</button>
-                    {{ kb_form.submit(class="btn btn-primary") }}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="z-index: 1080;">{{ t.cancel }}</button>
+                    {{ kb_form.submit(class="btn btn-primary", style="z-index: 1080;") }}
                 </div>
             </form>
         </div>

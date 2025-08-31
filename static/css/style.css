@@ -825,6 +825,62 @@ main {
     }
 }
 
+/* Bootstrap Modal Fixes */
+.modal-backdrop {
+    z-index: 1040 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal {
+    z-index: 1050 !important;
+}
+
+.modal-dialog {
+    z-index: 1060 !important;
+}
+
+.modal-content {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-tertiary);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.modal-title {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Ensure modal buttons are clickable */
+.modal .btn {
+    position: relative;
+    z-index: 1070;
+    pointer-events: auto;
+}
+
+/* Fix for modal backdrop interference */
+.modal.show {
+    display: block !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
 /* Accessibility */
 .sr-only {
     position: absolute;
