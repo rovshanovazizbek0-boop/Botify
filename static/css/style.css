@@ -825,10 +825,18 @@ main {
     }
 }
 
+/* Critical Button Click Fixes */
+button, .btn, a, input[type="submit"], input[type="button"] {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10;
+}
+
 /* Bootstrap Modal Fixes */
 .modal-backdrop {
     z-index: 1040 !important;
     background-color: rgba(0, 0, 0, 0.5) !important;
+    pointer-events: auto !important;
 }
 
 .modal {
@@ -837,6 +845,7 @@ main {
 
 .modal-dialog {
     z-index: 1060 !important;
+    pointer-events: auto !important;
 }
 
 .modal-content {
@@ -846,18 +855,26 @@ main {
     box-shadow: var(--shadow-xl);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    z-index: 1070 !important;
+    pointer-events: auto !important;
 }
 
 .modal-header {
     border-bottom: 1px solid var(--border-light);
     background: var(--bg-tertiary);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    pointer-events: auto !important;
+}
+
+.modal-body {
+    pointer-events: auto !important;
 }
 
 .modal-footer {
     border-top: 1px solid var(--border-light);
     background: var(--bg-tertiary);
     border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    pointer-events: auto !important;
 }
 
 .modal-title {
@@ -867,18 +884,65 @@ main {
 
 /* Ensure modal buttons are clickable */
 .modal .btn {
-    position: relative;
-    z-index: 1070;
-    pointer-events: auto;
+    position: relative !important;
+    z-index: 1080 !important;
+    pointer-events: auto !important;
+}
+
+.modal .btn-close {
+    z-index: 1090 !important;
+    pointer-events: auto !important;
 }
 
 /* Fix for modal backdrop interference */
 .modal.show {
     display: block !important;
+    pointer-events: auto !important;
 }
 
 .modal-backdrop.show {
     opacity: 0.5 !important;
+    pointer-events: auto !important;
+}
+
+/* Form elements must be clickable */
+.form-control, .form-select, .form-check-input {
+    pointer-events: auto !important;
+    z-index: 10 !important;
+    position: relative;
+}
+
+/* Nav items and links */
+.nav-link, .nav-item {
+    pointer-events: auto !important;
+    z-index: 10 !important;
+}
+
+/* Card interactive elements */
+.card .btn, .card button {
+    pointer-events: auto !important;
+    z-index: 10 !important;
+}
+
+/* Dropdown elements */
+.dropdown-toggle, .dropdown-item {
+    pointer-events: auto !important;
+    z-index: 10 !important;
+}
+
+/* Prevent any global pointer-events none */
+* {
+    pointer-events: auto;
+}
+
+/* Override any potential blocking overlays */
+.container, .container-fluid, .row, .col {
+    pointer-events: auto;
+}
+
+/* Tab navigation must work */
+.tab-content, .tab-pane {
+    pointer-events: auto;
 }
 
 /* Accessibility */
