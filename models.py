@@ -44,9 +44,9 @@ class User(UserMixin, db.Model):
         if not self.is_subscription_active():
             return False
         if self.subscription_type == SubscriptionType.FREE:
-            return self.bots.count() < 1
+            return len(self.bots) < 1
         elif self.subscription_type == SubscriptionType.BUSINESS:
-            return self.bots.count() < 20
+            return len(self.bots) < 20
         else:  # ENTERPRISE
             return True
 
