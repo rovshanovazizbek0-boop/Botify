@@ -175,6 +175,32 @@ def bot_settings(bot_id):
         kb.title = kb_form.title.data
         kb.content = kb_form.content.data
         kb.bot_id = bot.id
+        
+        # Handle file upload
+        if kb_form.file_upload.data:
+            file = kb_form.file_upload.data
+            filename = file.filename
+            
+            # Process different file types
+            if filename.lower().endswith('.txt'):
+                try:
+                    file_content = file.read().decode('utf-8')
+                    kb.content = file_content if not kb.content else kb.content + "\n\n" + file_content
+                    kb.file_type = 'text'
+                except UnicodeDecodeError:
+                    flash('Error reading text file. Please ensure it is UTF-8 encoded.', 'error')
+                    return redirect(url_for('dashboard.bot_settings', bot_id=bot.id))
+            elif filename.lower().endswith('.pdf'):
+                # For now, just save the filename and type
+                kb.file_type = 'pdf'
+                flash('PDF file uploaded. Note: PDF text extraction is not yet implemented.', 'warning')
+            elif filename.lower().endswith(('.doc', '.docx')):
+                # For now, just save the filename and type  
+                kb.file_type = 'document'
+                flash('Document uploaded. Note: Document text extraction is not yet implemented.', 'warning')
+        else:
+            kb.file_type = 'text'
+        
         db.session.add(kb)
         db.session.commit()
         flash('Knowledge base item added successfully!', 'success')
