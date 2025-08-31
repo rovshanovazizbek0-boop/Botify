@@ -3,162 +3,175 @@
 {% block title %}Dashboard - BotFactory{% endblock %}
 
 {% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" rel="preload" as="script">
 {% endblock %}
 
 {% block content %}
-<div class="container-mobile p-lg animate-fade-in">
-    <!-- Welcome Header -->
-    <div class="text-center mb-xl">
-        <h1 class="text-2xl font-bold mb-sm" style="font-size: 1.75rem; font-weight: var(--font-weight-bold); color: var(--text-primary);">Welcome back, {{ current_user.username }}! 👋</h1>
-        <p style="color: var(--text-muted); font-size: 1rem;">Manage your bots and create new ones</p>
+<div class="container-premium mb-3xl">
+    <!-- Premium Welcome Header -->
+    <div class="text-center mb-3xl animate-fade-in-up">
+        <h1 class="welcome-text-premium heading-premium">
+            Xush kelibsiz, {{ current_user.username }}! 🚀
+        </h1>
+        <p class="subtitle-premium">
+            AI botlaringizni boshqaring va yangi imkoniyatlarni kashf eting
+        </p>
     </div>
 
-    <!-- Stats Overview -->
-    <div class="grid grid-cols-2 md:grid-cols-4 mb-xl">
-        <div class="stat-card animate-slide-in">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
+    <!-- Premium Stats Overview -->
+    <div class="grid-premium grid-cols-2 md:grid-cols-4 mb-3xl">
+        <div class="stat-card-premium animate-slide-in-left stagger-1">
+            <div class="stat-icon-premium" style="background: var(--primary-gradient);">
                 <i class="fas fa-robot"></i>
             </div>
-            <div class="stat-number">{{ bots|length if bots else 0 }}</div>
-            <div class="stat-label">Active Bots</div>
+            <div class="stat-number-premium">{{ bots|length if bots else 0 }}</div>
+            <div class="stat-label-premium">Faol Botlar</div>
         </div>
         
-        <div class="stat-card animate-slide-in" style="animation-delay: 0.1s;">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+        <div class="stat-card-premium animate-slide-in-left stagger-2">
+            <div class="stat-icon-premium" style="background: var(--success-gradient);">
                 <i class="fas fa-comments"></i>
             </div>
-            <div class="stat-number">{{ total_messages|default(0) }}</div>
-            <div class="stat-label">Messages Today</div>
+            <div class="stat-number-premium">{{ total_messages|default(0) }}</div>
+            <div class="stat-label-premium">Bugungi Xabarlar</div>
         </div>
         
-        <div class="stat-card animate-slide-in" style="animation-delay: 0.2s;">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--info-color), #1d4ed8);">
+        <div class="stat-card-premium animate-slide-in-left stagger-3">
+            <div class="stat-icon-premium" style="background: var(--warning-gradient);">
                 <i class="fas fa-users"></i>
             </div>
-            <div class="stat-number">{{ total_users|default(0) }}</div>
-            <div class="stat-label">Total Users</div>
+            <div class="stat-number-premium">{{ total_users|default(0) }}</div>
+            <div class="stat-label-premium">Jami Foydalanuvchilar</div>
         </div>
         
-        <div class="stat-card animate-slide-in" style="animation-delay: 0.3s;">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+        <div class="stat-card-premium animate-slide-in-left stagger-4">
+            <div class="stat-icon-premium" style="background: var(--secondary-gradient);">
                 <i class="fas fa-crown"></i>
             </div>
-            <div class="stat-number">{{ current_user.subscription_type.value|title }}</div>
-            <div class="stat-label">Plan</div>
+            <div class="stat-number-premium">{{ current_user.subscription_type.value|title }}</div>
+            <div class="stat-label-premium">Tarifingiz</div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="mb-xl">
-        <h2 style="font-size: 1.5rem; font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-lg);">Quick Actions</h2>
+    <!-- Premium Quick Actions -->
+    <div class="mb-3xl">
+        <h2 class="heading-premium font-black text-center mb-xl" style="font-size: 2rem;">
+            Tezkor Amallar
+        </h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid-premium grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {% if current_user.can_create_bot() %}
-            <a href="{{ url_for('dashboard.bot_create') }}" class="quick-action animate-slide-in">
-                <div class="action-icon">
-                    <i class="fas fa-plus"></i>
+            <a href="{{ url_for('dashboard.bot_create') }}" class="action-card-premium animate-fade-in-up stagger-1">
+                <div class="action-icon-premium" style="background: var(--primary-gradient);">
+                    <i class="fas fa-magic"></i>
                 </div>
-                <div class="action-title">Create New Bot</div>
-                <div class="action-description">Build an AI chatbot with custom knowledge base</div>
+                <div class="action-title-premium">Yangi Bot Yaratish</div>
+                <div class="action-description-premium">AI chatbot yarating va bilimlar bazasini sozlang</div>
             </a>
             {% else %}
-            <a href="#" class="quick-action animate-slide-in">
-                <div class="action-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
-                    <i class="fas fa-crown"></i>
+            <a href="#" class="action-card-premium animate-fade-in-up stagger-1">
+                <div class="action-icon-premium" style="background: var(--warning-gradient);">
+                    <i class="fas fa-rocket"></i>
                 </div>
-                <div class="action-title">Upgrade Plan</div>
-                <div class="action-description">Unlock more bots and advanced features</div>
+                <div class="action-title-premium">Tarifni Yangilash</div>
+                <div class="action-description-premium">Ko'proq botlar va premium funksiyalarni oching</div>
             </a>
             {% endif %}
             
             {% if bots and bots|length > 0 %}
-            <a href="{{ url_for('dashboard.analytics', bot_id=bots[0].id) }}" class="quick-action animate-slide-in" style="animation-delay: 0.1s;">
-                <div class="action-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+            <a href="{{ url_for('dashboard.analytics', bot_id=bots[0].id) }}" class="action-card-premium animate-fade-in-up stagger-2">
+                <div class="action-icon-premium" style="background: var(--success-gradient);">
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <div class="action-title">View Analytics</div>
-                <div class="action-description">Track performance and user engagement</div>
+                <div class="action-title-premium">Statistikani Ko'rish</div>
+                <div class="action-description-premium">Bot samaradorligi va foydalanuvchi faolligini kuzating</div>
             </a>
             {% else %}
-            <a href="{{ url_for('dashboard.bot_create') }}" class="quick-action animate-slide-in" style="animation-delay: 0.1s;">
-                <div class="action-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
-                    <i class="fas fa-plus"></i>
+            <a href="{{ url_for('dashboard.bot_create') }}" class="action-card-premium animate-fade-in-up stagger-2">
+                <div class="action-icon-premium" style="background: var(--success-gradient);">
+                    <i class="fas fa-sparkles"></i>
                 </div>
-                <div class="action-title">Create First Bot</div>
-                <div class="action-description">Start by creating your first bot</div>
+                <div class="action-title-premium">Birinchi Botni Yarating</div>
+                <div class="action-description-premium">AI chatbot bilan tanishing va ishni boshlang</div>
             </a>
             {% endif %}
             
-            <a href="{{ url_for('dashboard.profile') }}" class="quick-action animate-slide-in" style="animation-delay: 0.2s;">
-                <div class="action-icon" style="background: linear-gradient(135deg, var(--info-color), #1d4ed8);">
-                    <i class="fas fa-user-cog"></i>
+            <a href="{{ url_for('dashboard.profile') }}" class="action-card-premium animate-fade-in-up stagger-3">
+                <div class="action-icon-premium" style="background: var(--danger-gradient);">
+                    <i class="fas fa-user-astronaut"></i>
                 </div>
-                <div class="action-title">Account Settings</div>
-                <div class="action-description">Manage your profile and preferences</div>
+                <div class="action-title-premium">Profilni Sozlash</div>
+                <div class="action-description-premium">Hisobingiz va afzalliklaringizni boshqaring</div>
             </a>
         </div>
     </div>
 
-    <!-- My Bots Section -->
+    <!-- Premium My Bots Section -->
     {% if bots %}
-    <div class="mb-xl">
-        <div class="d-flex justify-content-between align-items-center mb-lg">
-            <h2 style="font-size: 1.5rem; font-weight: var(--font-weight-semibold); color: var(--text-primary);">My Bots ({{ bots|length }})</h2>
+    <div class="mb-3xl">
+        <div class="d-flex justify-content-between align-items-center mb-xl">
+            <h2 class="heading-premium font-black" style="font-size: 2rem;">
+                Mening Botlarim ({{ bots|length }})
+            </h2>
             {% if current_user.can_create_bot() %}
-            <a href="{{ url_for('dashboard.bot_create') }}" class="btn-modern btn-primary-modern btn-sm-modern">
+            <a href="{{ url_for('dashboard.bot_create') }}" class="btn-premium btn-primary-premium">
                 <i class="fas fa-plus"></i>
-                Add Bot
+                Yangi Bot
             </a>
             {% endif %}
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid-premium grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {% for bot in bots %}
-            <div class="bot-card animate-slide-in" style="animation-delay: {{ loop.index * 0.1 }}s;">
-                <div class="bot-avatar">
+            <div class="bot-card-premium animate-fade-in-up" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                <div class="bot-avatar-premium" style="background: var(--primary-gradient);">
                     {% if bot.avatar_url %}
                     <img src="{{ bot.avatar_url }}" alt="{{ bot.name }}">
                     {% else %}
                     <i class="fas fa-robot"></i>
                     {% endif %}
                     
-                    <div class="bot-status {% if bot.is_active and bot.telegram_token %}online{% elif bot.telegram_token %}paused{% else %}offline{% endif %}"></div>
+                    <div class="bot-status-premium {% if bot.is_active and bot.telegram_token %}online{% elif bot.telegram_token %}paused{% else %}offline{% endif %}"></div>
                 </div>
                 
-                <div class="bot-name">{{ bot.name }}</div>
+                <h3 class="font-bold mb-md" style="font-size: 1.25rem; color: var(--text-primary);">
+                    {{ bot.name }}
+                </h3>
                 
                 {% if bot.description %}
-                <div class="bot-description">{{ bot.description[:80] }}{% if bot.description|length > 80 %}...{% endif %}</div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: var(--space-lg);">
+                    {{ bot.description[:100] }}{% if bot.description|length > 100 %}...{% endif %}
+                </p>
                 {% endif %}
                 
                 <div class="mb-lg">
                     {% if bot.is_active and bot.telegram_token %}
-                    <span class="badge-modern badge-success">
-                        <i class="fas fa-check"></i>
-                        Online
+                    <span class="glass-effect" style="color: #10b981; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-full); font-size: 0.8rem; font-weight: var(--font-weight-semibold); text-transform: uppercase; letter-spacing: 0.05em;">
+                        <i class="fas fa-circle" style="font-size: 0.5rem; margin-right: var(--space-xs);"></i>
+                        Onlayn
                     </span>
                     {% elif bot.telegram_token %}
-                    <span class="badge-modern badge-warning">
-                        <i class="fas fa-pause"></i>
-                        Paused
+                    <span class="glass-effect" style="color: #f59e0b; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-full); font-size: 0.8rem; font-weight: var(--font-weight-semibold); text-transform: uppercase; letter-spacing: 0.05em;">
+                        <i class="fas fa-pause" style="font-size: 0.5rem; margin-right: var(--space-xs);"></i>
+                        Pauza
                     </span>
                     {% else %}
-                    <span class="badge-modern badge-danger">
-                        <i class="fas fa-exclamation"></i>
-                        Setup Required
+                    <span class="glass-effect" style="color: #ef4444; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-full); font-size: 0.8rem; font-weight: var(--font-weight-semibold); text-transform: uppercase; letter-spacing: 0.05em;">
+                        <i class="fas fa-exclamation" style="font-size: 0.5rem; margin-right: var(--space-xs);"></i>
+                        Sozlash Kerak
                     </span>
                     {% endif %}
                 </div>
                 
-                <div class="bot-actions">
-                    <a href="{{ url_for('dashboard.bot_settings', bot_id=bot.id) }}" class="btn-modern btn-primary-modern btn-sm-modern">
+                <div style="display: flex; gap: var(--space-sm); justify-content: center;">
+                    <a href="{{ url_for('dashboard.bot_settings', bot_id=bot.id) }}" class="btn-premium btn-primary-premium" style="padding: var(--space-md) var(--space-lg); font-size: 0.875rem;">
                         <i class="fas fa-cog"></i>
-                        Settings
+                        Sozlash
                     </a>
-                    <a href="{{ url_for('dashboard.analytics', bot_id=bot.id) }}" class="btn-modern btn-secondary-modern btn-sm-modern">
+                    <a href="{{ url_for('dashboard.analytics', bot_id=bot.id) }}" class="btn-premium" style="background: var(--glass-bg); color: var(--text-primary); padding: var(--space-md) var(--space-lg); font-size: 0.875rem;">
                         <i class="fas fa-chart-bar"></i>
-                        Analytics
+                        Statistika
                     </a>
                 </div>
             </div>
@@ -166,29 +179,86 @@
         </div>
     </div>
     {% else %}
-    <!-- Empty State -->
-    <div class="text-center p-xl" style="background: var(--card-bg); border-radius: var(--radius-xl); border: 1px solid var(--border-light);">
-        <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
-            <i class="fas fa-robot"></i>
+    <!-- Premium Empty State -->
+    <div class="premium-card text-center p-xl animate-fade-in-up" style="padding: var(--space-3xl);">
+        <div class="animate-float" style="font-size: 5rem; margin-bottom: var(--space-xl);">
+            🤖
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-md);">No bots yet</h3>
-        <p style="color: var(--text-muted); margin-bottom: var(--space-xl);">Create your first AI chatbot to get started</p>
+        <h3 class="heading-premium font-black mb-lg" style="font-size: 2rem;">
+            Hali botlaringiz yo'q
+        </h3>
+        <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: var(--space-2xl); max-width: 400px; margin-left: auto; margin-right: auto;">
+            Birinchi AI chatbotingizni yaratib, ajoyib imkoniyatlarni kashf eting
+        </p>
         {% if current_user.can_create_bot() %}
-        <a href="{{ url_for('dashboard.bot_create') }}" class="btn-modern btn-primary-modern btn-lg-modern">
-            <i class="fas fa-plus"></i>
-            Create Your First Bot
+        <a href="{{ url_for('dashboard.bot_create') }}" class="btn-premium btn-primary-premium" style="padding: var(--space-lg) var(--space-2xl); font-size: 1.1rem;">
+            <i class="fas fa-magic"></i>
+            Birinchi Botni Yaratish
         </a>
         {% else %}
-        <a href="#" class="btn-modern btn-primary-modern btn-lg-modern">
+        <a href="#" class="btn-premium btn-primary-premium" style="padding: var(--space-lg) var(--space-2xl); font-size: 1.1rem;">
             <i class="fas fa-crown"></i>
-            Upgrade to Create Bots
+            Bot Yaratish Uchun Yangilang
         </a>
         {% endif %}
     </div>
     {% endif %}
 </div>
+
+<!-- Floating Elements for Visual Appeal -->
+<div style="position: fixed; top: 10%; right: 5%; width: 100px; height: 100px; background: var(--primary-gradient); border-radius: 50%; opacity: 0.1; z-index: -1; animation: float 6s ease-in-out infinite;"></div>
+<div style="position: fixed; bottom: 20%; left: 8%; width: 80px; height: 80px; background: var(--success-gradient); border-radius: 50%; opacity: 0.1; z-index: -1; animation: float 4s ease-in-out infinite reverse;"></div>
+<div style="position: fixed; top: 60%; right: 12%; width: 60px; height: 60px; background: var(--warning-gradient); border-radius: 50%; opacity: 0.1; z-index: -1; animation: float 5s ease-in-out infinite;"></div>
+
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+// Add premium interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add glow effect on card hover
+    const premiumCards = document.querySelectorAll('.stat-card-premium, .action-card-premium, .bot-card-premium');
+    
+    premiumCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.animation = 'glow 0.5s ease-out';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.animation = '';
+        });
+    });
+    
+    // Add parallax effect to floating elements
+    window.addEventListener('mousemove', function(e) {
+        const floatingElements = document.querySelectorAll('[style*="position: fixed"]');
+        const strength = 25;
+        
+        floatingElements.forEach((el, index) => {
+            const x = (e.clientX * strength) / 1000;
+            const y = (e.clientY * strength) / 1000;
+            
+            el.style.transform = `translate(${x * (index + 1)}px, ${y * (index + 1)}px) rotate(${x * 0.1}deg)`;
+        });
+    });
+    
+    // Add stagger animation to grid items
+    const animatedElements = document.querySelectorAll('.animate-fade-in-up, .animate-slide-in-left');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0) translateX(0)';
+            }
+        });
+    });
+    
+    animatedElements.forEach(el => {
+        el.style.opacity = '0';
+        observer.observe(el);
+    });
+});
+</script>
 {% endblock %}

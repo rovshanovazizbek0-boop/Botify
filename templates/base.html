@@ -22,7 +22,7 @@
     {% block head %}{% endblock %}
 </head>
 <body class="mobile-app">
-    <!-- Mobile Header -->
+    <!-- Premium Mobile Header -->
     {% if current_user.is_authenticated %}
     <header class="app-header has-header">
         <a href="{{ url_for('dashboard.main') }}" class="header-brand">
@@ -30,13 +30,13 @@
             BotFactory
         </a>
         
-        <div class="header-actions">
-            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <div class="header-actions" style="display: flex; align-items: center; gap: var(--space-md);">
+            <button class="theme-toggle-premium" onclick="toggleTheme()" aria-label="Toggle theme">
                 <i class="fas fa-moon theme-icon"></i>
             </button>
             
             <div class="dropdown">
-                <button class="theme-toggle" data-bs-toggle="dropdown" aria-label="User menu">
+                <button class="theme-toggle-premium" data-bs-toggle="dropdown" aria-label="User menu">
                     <i class="fas fa-user"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -89,18 +89,18 @@
         </a>
     </nav>
     {% else %}
-    <!-- Public Header -->
+    <!-- Premium Public Header -->
     <header class="app-header">
         <a href="{{ url_for('main.index') }}" class="header-brand">
             <i class="fas fa-robot"></i>
             BotFactory
         </a>
         
-        <div class="header-actions">
-            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <div class="header-actions" style="display: flex; align-items: center; gap: var(--space-md);">
+            <button class="theme-toggle-premium" onclick="toggleTheme()" aria-label="Toggle theme">
                 <i class="fas fa-moon theme-icon"></i>
             </button>
-            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">
+            <a href="{{ url_for('auth.login') }}" class="btn-premium btn-primary-premium" style="padding: var(--space-sm) var(--space-lg); font-size: 0.875rem;">
                 {{ t.login }}
             </a>
         </div>
