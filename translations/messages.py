@@ -17,6 +17,7 @@ TRANSLATIONS = {
         
         # Features
         'features_title': 'Powerful Features',
+        'features_subtitle': 'Build powerful AI chatbots with professional features',
         'ai_powered': 'AI-Powered',
         'ai_powered_desc': 'Advanced AI using Google Gemini for intelligent conversations',
         'multi_channel': 'Multi-Channel',
@@ -28,6 +29,8 @@ TRANSLATIONS = {
         
         # Pricing
         'pricing_title': 'Choose Your Plan',
+        'pricing_subtitle': 'Choose the perfect plan for your business needs',
+        'popular': 'Popular',
         'free_plan': 'Free Trial',
         'business_plan': 'Business',
         'enterprise_plan': 'Enterprise',
@@ -35,6 +38,11 @@ TRANSLATIONS = {
         'business_price': '$49/month',
         'enterprise_price': '$99/month',
         'select_plan': 'Select Plan',
+        
+        # Call to Action
+        'cta_title': 'Ready to build your first AI chatbot?',
+        'cta_subtitle': 'Join thousands of businesses already using BotFactory to automate their customer service.',
+        'start_free_trial': 'Start Free Trial',
         
         # Authentication
         'sign_in': 'Sign In',
@@ -134,6 +142,7 @@ TRANSLATIONS = {
         
         # Features
         'features_title': 'Мощные возможности',
+        'features_subtitle': 'Создавайте мощных ИИ-чатботов с профессиональными функциями',
         'ai_powered': 'ИИ-технологии',
         'ai_powered_desc': 'Продвинутый ИИ на базе Google Gemini для умных разговоров',
         'multi_channel': 'Мульти-канальность',
@@ -145,6 +154,8 @@ TRANSLATIONS = {
         
         # Pricing
         'pricing_title': 'Выберите план',
+        'pricing_subtitle': 'Выберите идеальный план для нужд вашего бизнеса',
+        'popular': 'Популярный',
         'free_plan': 'Бесплатная версия',
         'business_plan': 'Бизнес',
         'enterprise_plan': 'Корпоративный',
@@ -152,6 +163,11 @@ TRANSLATIONS = {
         'business_price': '$49/месяц',
         'enterprise_price': '$99/месяц',
         'select_plan': 'Выбрать план',
+        
+        # Call to Action
+        'cta_title': 'Готовы создать своего первого ИИ-чатбота?',
+        'cta_subtitle': 'Присоединяйтесь к тысячам компаний, уже использующих BotFactory для автоматизации клиентского сервиса.',
+        'start_free_trial': 'Начать бесплатный период',
         
         # Authentication
         'sign_in': 'Войти',
@@ -251,6 +267,7 @@ TRANSLATIONS = {
         
         # Features
         'features_title': 'Kuchli imkoniyatlar',
+        'features_subtitle': 'Professional xususiyatlar bilan kuchli AI chatbotlar yarating',
         'ai_powered': 'AI texnologiyasi',
         'ai_powered_desc': 'Google Gemini asosidagi ilg\'or AI aqlli suhbatlar uchun',
         'multi_channel': 'Ko\'p kanalli',
@@ -262,6 +279,8 @@ TRANSLATIONS = {
         
         # Pricing
         'pricing_title': 'Rejangizni tanlang',
+        'pricing_subtitle': 'Biznesingiz ehtiyojlari uchun mukammal rejani tanlang',
+        'popular': 'Mashhur',
         'free_plan': 'Bepul sinov',
         'business_plan': 'Biznes',
         'enterprise_plan': 'Korporativ',
@@ -269,6 +288,11 @@ TRANSLATIONS = {
         'business_price': '$49/oy',
         'enterprise_price': '$99/oy',
         'select_plan': 'Rejani tanlash',
+        
+        # Call to Action
+        'cta_title': 'Birinchi AI chatbotingizni yaratishga tayyormisiz?',
+        'cta_subtitle': 'Mijozlar xizmatini avtomatlashtirishda BotFactory\'dan foydalanayotgan minglab kompaniyalarga qo\'shiling.',
+        'start_free_trial': 'Bepul sinovni boshlash',
         
         # Authentication
         'sign_in': 'Kirish',
