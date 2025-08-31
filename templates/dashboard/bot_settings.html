@@ -342,11 +342,11 @@
                     
                     <div class="mb-3">
                         <label for="content" class="form-label">{{ t.content }}</label>
-                        {{ kb_form.content(class="form-control", rows="8") }}
+                        {{ kb_form.content(class="form-control", rows="8", placeholder="Enter content here or upload a file below...") }}
                         {% for error in kb_form.content.errors %}
                             <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
-                        <div class="form-text">Add information, FAQs, or instructions for your bot</div>
+                        <div class="form-text">Add information, FAQs, or instructions for your bot (optional if uploading file)</div>
                     </div>
                     
                     <div class="mb-3">

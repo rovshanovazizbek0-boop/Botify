@@ -39,9 +39,20 @@ class BotCreateForm(FlaskForm):
 
 class KnowledgeBaseForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired(), Length(min=1, max=200)])
-    content = TextAreaField('Content', validators=[DataRequired(), Length(min=1)])
+    content = TextAreaField('Content', validators=[Optional()])
     file_upload = FileField('Upload File', validators=[FileAllowed(['txt', 'pdf', 'doc', 'docx'])])
     submit = SubmitField('Add to Knowledge Base')
+    
+    def validate(self):
+        if not super().validate():
+            return False
+        
+        # Either content or file must be provided
+        if not self.content.data and not self.file_upload.data:
+            self.content.errors.append('Either content or file upload is required.')
+            return False
+        
+        return True
 
 class BotSettingsForm(FlaskForm):
     name = StringField('Bot Name', validators=[DataRequired(), Length(min=1, max=100)])

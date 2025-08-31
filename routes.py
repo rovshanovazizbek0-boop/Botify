@@ -173,7 +173,7 @@ def bot_settings(bot_id):
     if kb_form.validate_on_submit() and kb_form.submit.data:
         kb = KnowledgeBase()
         kb.title = kb_form.title.data
-        kb.content = kb_form.content.data
+        kb.content = kb_form.content.data or ""
         kb.bot_id = bot.id
         
         # Handle file upload
@@ -185,7 +185,10 @@ def bot_settings(bot_id):
             if filename.lower().endswith('.txt'):
                 try:
                     file_content = file.read().decode('utf-8')
-                    kb.content = file_content if not kb.content else kb.content + "\n\n" + file_content
+                    if kb.content:
+                        kb.content = kb.content + "\n\n" + file_content
+                    else:
+                        kb.content = file_content
                     kb.file_type = 'text'
                 except UnicodeDecodeError:
                     flash('Error reading text file. Please ensure it is UTF-8 encoded.', 'error')
@@ -193,13 +196,22 @@ def bot_settings(bot_id):
             elif filename.lower().endswith('.pdf'):
                 # For now, just save the filename and type
                 kb.file_type = 'pdf'
+                if not kb.content:
+                    kb.content = f"PDF file: {filename}"
                 flash('PDF file uploaded. Note: PDF text extraction is not yet implemented.', 'warning')
             elif filename.lower().endswith(('.doc', '.docx')):
                 # For now, just save the filename and type  
                 kb.file_type = 'document'
+                if not kb.content:
+                    kb.content = f"Document file: {filename}"
                 flash('Document uploaded. Note: Document text extraction is not yet implemented.', 'warning')
         else:
             kb.file_type = 'text'
+        
+        # Ensure we have content
+        if not kb.content:
+            flash('Please provide either content text or upload a file.', 'error')
+            return redirect(url_for('dashboard.bot_settings', bot_id=bot.id))
         
         db.session.add(kb)
         db.session.commit()
