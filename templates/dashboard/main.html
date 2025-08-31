@@ -1,88 +1,179 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t.dashboard }} - BotFactory{% endblock %}
+{% block title %}Dashboard - BotFactory{% endblock %}
 
 {% block head %}
 <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" rel="preload" as="script">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <!-- Simple Welcome Section -->
-    <div class="row mb-5">
-        <div class="col-12 text-center">
-            <h1 class="display-5 mb-3">Salom, {{ current_user.username }}! 👋</h1>
-            <p class="lead text-muted mb-4">Botlaringizni boshqaring va yangilarini yarating</p>
-        </div>
+<div class="container-mobile p-lg animate-fade-in">
+    <!-- Welcome Header -->
+    <div class="text-center mb-xl">
+        <h1 class="text-2xl font-bold mb-sm" style="font-size: 1.75rem; font-weight: var(--font-weight-bold); color: var(--text-primary);">Welcome back, {{ current_user.username }}! 👋</h1>
+        <p style="color: var(--text-muted); font-size: 1rem;">Manage your bots and create new ones</p>
     </div>
 
-    <!-- Simple Action Section -->
-    <div class="row mb-5">
-        <div class="col-md-8 mx-auto">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center p-5">
-                    {% if current_user.can_create_bot() %}
-                        <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
-                        <h4 class="mb-3">Yangi bot yarating</h4>
-                        <p class="text-muted mb-4">AI chatbot yaratish uchun quyidagi tugmani bosing</p>
-                        <a href="{{ url_for('dashboard.bot_create') }}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-robot me-2"></i>{{ t.create_bot }}
-                        </a>
-                    {% else %}
-                        <i class="fas fa-lock fa-3x text-warning mb-3"></i>
-                        <h4 class="mb-3">Obunani yangilang</h4>
-                        <p class="text-muted mb-4">Ko'proq botlar yaratish uchun obunangizni yangilang</p>
-                        <a href="#" class="btn btn-warning btn-lg">
-                            <i class="fas fa-crown me-2"></i>Obunani yangilash
-                        </a>
-                    {% endif %}
-                </div>
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-2 md:grid-cols-4 mb-xl">
+        <div class="stat-card animate-slide-in">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
+                <i class="fas fa-robot"></i>
             </div>
+            <div class="stat-number">{{ bots|length if bots else 0 }}</div>
+            <div class="stat-label">Active Bots</div>
+        </div>
+        
+        <div class="stat-card animate-slide-in" style="animation-delay: 0.1s;">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="stat-number">{{ total_messages|default(0) }}</div>
+            <div class="stat-label">Messages Today</div>
+        </div>
+        
+        <div class="stat-card animate-slide-in" style="animation-delay: 0.2s;">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--info-color), #1d4ed8);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">{{ total_users|default(0) }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        
+        <div class="stat-card animate-slide-in" style="animation-delay: 0.3s;">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="stat-number">{{ current_user.subscription_type.value|title }}</div>
+            <div class="stat-label">Plan</div>
         </div>
     </div>
 
-    <!-- Simple Bots Section -->
+    <!-- Quick Actions -->
+    <div class="mb-xl">
+        <h2 style="font-size: 1.5rem; font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-lg);">Quick Actions</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {% if current_user.can_create_bot() %}
+            <a href="{{ url_for('dashboard.bot_create') }}" class="quick-action animate-slide-in">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-title">Create New Bot</div>
+                <div class="action-description">Build an AI chatbot with custom knowledge base</div>
+            </a>
+            {% else %}
+            <a href="#" class="quick-action animate-slide-in">
+                <div class="action-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="action-title">Upgrade Plan</div>
+                <div class="action-description">Unlock more bots and advanced features</div>
+            </a>
+            {% endif %}
+            
+            <a href="{{ url_for('dashboard.analytics') }}" class="quick-action animate-slide-in" style="animation-delay: 0.1s;">
+                <div class="action-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="action-title">View Analytics</div>
+                <div class="action-description">Track performance and user engagement</div>
+            </a>
+            
+            <a href="{{ url_for('dashboard.profile') }}" class="quick-action animate-slide-in" style="animation-delay: 0.2s;">
+                <div class="action-icon" style="background: linear-gradient(135deg, var(--info-color), #1d4ed8);">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <div class="action-title">Account Settings</div>
+                <div class="action-description">Manage your profile and preferences</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- My Bots Section -->
     {% if bots %}
-    <div class="row">
-        <div class="col-12">
-            <h4 class="mb-4 text-center">{{ t.my_bots }} ({{ bots|length }})</h4>
+    <div class="mb-xl">
+        <div class="d-flex justify-content-between align-items-center mb-lg">
+            <h2 style="font-size: 1.5rem; font-weight: var(--font-weight-semibold); color: var(--text-primary);">My Bots ({{ bots|length }})</h2>
+            {% if current_user.can_create_bot() %}
+            <a href="{{ url_for('dashboard.bot_create') }}" class="btn-modern btn-primary-modern btn-sm-modern">
+                <i class="fas fa-plus"></i>
+                Add Bot
+            </a>
+            {% endif %}
         </div>
-        {% for bot in bots %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <div class="bot-avatar-large mb-3">
-                        {% if bot.avatar_url %}
-                        <img src="{{ bot.avatar_url }}" alt="{{ bot.name }}" class="rounded-circle" width="80" height="80">
-                        {% else %}
-                        <i class="fas fa-robot fa-2x"></i>
-                        {% endif %}
-                    </div>
-                    <h5 class="card-title">{{ bot.name }}</h5>
-                    {% if bot.description %}
-                    <p class="text-muted small">{{ bot.description[:80] }}{% if bot.description|length > 80 %}...{% endif %}</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {% for bot in bots %}
+            <div class="bot-card animate-slide-in" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                <div class="bot-avatar">
+                    {% if bot.avatar_url %}
+                    <img src="{{ bot.avatar_url }}" alt="{{ bot.name }}">
+                    {% else %}
+                    <i class="fas fa-robot"></i>
                     {% endif %}
                     
-                    <div class="mb-3">
-                        {% if bot.is_active and bot.telegram_token %}
-                        <span class="badge bg-success fs-6"><i class="fas fa-check me-1"></i>{{ t.active }}</span>
-                        {% else %}
-                        <span class="badge bg-warning fs-6"><i class="fas fa-cog me-1"></i>Sozlash kerak</span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('dashboard.bot_settings', bot_id=bot.id) }}" class="btn btn-primary">
-                            <i class="fas fa-cog me-2"></i>Sozlash
-                        </a>
-                        <a href="{{ url_for('dashboard.analytics', bot_id=bot.id) }}" class="btn btn-outline-success">
-                            <i class="fas fa-chart-line me-2"></i>Statistika
-                        </a>
-                    </div>
+                    <div class="bot-status {% if bot.is_active and bot.telegram_token %}online{% elif bot.telegram_token %}paused{% else %}offline{% endif %}"></div>
+                </div>
+                
+                <div class="bot-name">{{ bot.name }}</div>
+                
+                {% if bot.description %}
+                <div class="bot-description">{{ bot.description[:80] }}{% if bot.description|length > 80 %}...{% endif %}</div>
+                {% endif %}
+                
+                <div class="mb-lg">
+                    {% if bot.is_active and bot.telegram_token %}
+                    <span class="badge-modern badge-success">
+                        <i class="fas fa-check"></i>
+                        Online
+                    </span>
+                    {% elif bot.telegram_token %}
+                    <span class="badge-modern badge-warning">
+                        <i class="fas fa-pause"></i>
+                        Paused
+                    </span>
+                    {% else %}
+                    <span class="badge-modern badge-danger">
+                        <i class="fas fa-exclamation"></i>
+                        Setup Required
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <div class="bot-actions">
+                    <a href="{{ url_for('dashboard.bot_settings', bot_id=bot.id) }}" class="btn-modern btn-primary-modern btn-sm-modern">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="{{ url_for('dashboard.analytics', bot_id=bot.id) }}" class="btn-modern btn-secondary-modern btn-sm-modern">
+                        <i class="fas fa-chart-bar"></i>
+                        Analytics
+                    </a>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center p-xl" style="background: var(--card-bg); border-radius: var(--radius-xl); border: 1px solid var(--border-light);">
+        <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
+            <i class="fas fa-robot"></i>
+        </div>
+        <h3 style="font-size: 1.5rem; font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--space-md);">No bots yet</h3>
+        <p style="color: var(--text-muted); margin-bottom: var(--space-xl);">Create your first AI chatbot to get started</p>
+        {% if current_user.can_create_bot() %}
+        <a href="{{ url_for('dashboard.bot_create') }}" class="btn-modern btn-primary-modern btn-lg-modern">
+            <i class="fas fa-plus"></i>
+            Create Your First Bot
+        </a>
+        {% else %}
+        <a href="#" class="btn-modern btn-primary-modern btn-lg-modern">
+            <i class="fas fa-crown"></i>
+            Upgrade to Create Bots
+        </a>
+        {% endif %}
     </div>
     {% endif %}
 </div>
