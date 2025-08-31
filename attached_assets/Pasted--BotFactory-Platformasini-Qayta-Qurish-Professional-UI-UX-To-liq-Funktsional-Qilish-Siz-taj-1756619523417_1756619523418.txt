@@ -1,0 +1,300 @@
+🔄 BotFactory Platformasini Qayta Qurish - Professional UI/UX & To'liq Funktsional Qilish
+Siz — tajribali full-stack dasturchi va UI/UX dizayner. Sizga "BotFactory" loyihasini tubdan qayta qurish vazifasi berilmoqda. Loyiha yaratilgan, lekin dizayn va funksionallik qoniqarsiz. Siz buni professional darajada qayta yozishingiz kerak. 
+
+🎯 Asosiy Muammolar
+Dizayn muammosi: Dashboard tushunarsiz, sodda emas, ilovalar kabi bo'lishi kerak
+Telegram muammosi: Bot ishlamayapti, bilimlar bazasini qo'shib bo'lmayapti
+Umumiy foydalanish qulayligi: Foydalanuvchi uchun intuitiv bo'lmagan interfeys
+🎨 Professional UI/UX Dizayn Talablari
+Dashboard Dizayni:
+
+Mobile-first dizayn - ilovalar kabi sodda va intuitiv
+Card-based layout - har bir funksiya alohida karta sifatida
+Bottom navigation (mobile uchun) - Home, Bots, Analytics, Profile
+Dark/Light theme - foydalanuvchi tanlovi
+Real-time preview - bot yaratish jarayonida real-time test
+Drag & drop - bilimlar bazasini qulay qo'shish
+Progressive onboarding - yangi foydalanuvchilar uchun qadamma-qadam yo'riqnoma
+Asosiy Sahifalar:
+
+Home Screen - Umumiy statistika, tezkor kirish tugmalari
+Bot List - Barcha botlar ro'yxati, status bilan
+Bot Builder - Intuitiv bot yaratish oynasi
+Knowledge Base - Drag & drop bilimlar qo'shish
+Analytics - Grafiklar va statistikalar
+Settings - Profil va sozlamalar
+🔧 Telegram Integratsiya Fix
+Muammoni hal qilish:
+
+Webhook sozlamalari - To'g'ri webhook URL sozlash
+Message handler - Kiruvchi xabarlarni to'g'ri qabul qilish
+Knowledge base integration - AI bilan bog'lanish
+Async/await - Telegram bot uchun to'g'ri async loop
+Error handling - Xatoliklarni kuzatish va log qilish
+📱 Mobile App Style UI Components
+
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+BotFactory Mobile UI Structure:
+
+📱 HOME SCREEN
+├── Welcome back, [User]!
+├── 📊 Active Bots: 2/5
+├── 💬 Today Messages: 42
+├── 🚀 Quick Actions:
+│   ├── ➕ Create New Bot
+│   ├── 📈 View Analytics
+│   └── 🤖 Test My Bot
+└── 📋 My Bots List
+    ├── 🤖 Sales Bot [🟢 Online]
+    ├── 🤖 Support Bot [🟡 Paused]
+    └── ➕ Add Bot
+
+🤖 BOT BUILDER
+├── 📝 Bot Name: ___________
+├── 🎨 Avatar: [Upload Photo]
+├── 📚 Knowledge Base:
+│   ├── 📁 Product Info [3 docs]
+│   ├── 📁 FAQ [12 docs]
+│   └── ➕ Add Knowledge
+├── 📱 Channels:
+│   ├── ✅ Telegram
+│   ├── ⬜ WhatsApp
+│   └ ⬜ Instagram
+├── 🎯 Advanced Settings
+└── 🚀 Publish Bot
+
+📚 KNOWLEDGE BASE
+├── Drag & Drop Files Here
+├── Or paste text content:
+│   [Large Text Area]
+├── 📁 Current Documents:
+│   ├── product_manual.pdf
+│   ├── faq.docx
+│   └── company_info.txt
+├── 🔍 Search Documents
+└── 🗑️ Delete Selected
+🛠️ To'liq Qayta Yozish Strukturasi
+
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+BotFactory/
+│
+├── main.py                 # Asosiy API (FastAPI) - to'g'rilangan
+├── .env
+├── requirements.txt
+├── Dockerfile
+├── render.yaml
+│
+├── database/
+│   └── db.py               # DB connection - tekshirilgan
+│
+├── models/
+│   ├── user.py
+│   ├── bot.py
+│   ├── knowledge_base.py
+│   └── message.py
+│
+├── api/
+│   └── routes/
+│       ├── users.py
+│       ├── bots.py
+│       └── knowledge.py
+│
+├── services/
+│   ├── ai_service.py       # Google Qwen API - yangilangan
+│   ├── telegram_service.py # TO'LIQ QAYTA YOZILISHI KERAK
+│   ├── whatsapp_service.py
+│   └── ui_service.py       # Frontend rendering
+│
+├── utils/
+│   ├── helpers.py
+│   └── validators.py
+│
+├── templates/
+│   └── frontend/
+│       ├── components/     # Reusable UI components
+│       ├── layouts/        # Page layouts
+│       └── pages/          # Individual pages
+│           ├── home.html
+│           ├── bot-builder.html
+│           ├── knowledge.html
+│           └── analytics.html
+│
+└── static/
+    ├── css/
+    │   ├── main.css        # Mobile-first CSS
+    │   ├── mobile.css      # Mobile-specific styles
+    │   └── themes/         # Dark/Light themes
+    ├── js/
+    │   ├── app.js          # Main application logic
+    │   ├── telegram-fix.js # Telegram integration fix
+    │   └── components/     # UI component scripts
+    └── images/
+🔧 Telegram Service Fix - Asosiy O'zgarishlar
+telegram_service.py qayta yozilishi kerak:
+
+To'g'ri webhook sozlamalari
+Async message handling
+Knowledge base bilan integratsiya
+Error logging va monitoring
+User session management
+Requirements.txt yangilanishi kerak:
+
+txt
+
+
+1
+2
+3
+4
+5
+6
+7
+8
+fastapi
+uvicorn
+python-telegram-bot==13.15  # Stable version
+sqlalchemy
+psycopg2-binary
+python-dotenv
+google-generativeai
+aiohttp
+🎯 UI/UX Qayta Dizayn Qilish Talablari
+1. Mobile-First Approach:
+
+Touch-friendly interfeys
+Katta tugmalar va maydonlar
+Swipe gestures qo'llab-quvvatlash
+Responsive design
+2. Intuitive Navigation:
+
+Bottom navigation bar (mobile)
+Sidebar navigation (desktop)
+Breadcrumb navigation
+Clear call-to-action buttons
+3. Visual Feedback:
+
+Loading indicators
+Success/error toasts
+Progress bars
+Interactive elements
+4. Accessibility:
+
+Contrast colors
+Font sizes
+Keyboard navigation
+Screen reader support
+🚀 Qayta Qurish Qadamlari
+UI/UX dizayn qayta ishlab chiqish
+Mobile app style dizayn
+Component-based approach
+Dark/light theme
+Telegram service to'liq qayta yozish
+Webhook to'g'rilash
+Message handler fix
+Knowledge base integration
+Frontend qayta yozish
+Modern CSS framework
+JavaScript components
+Responsive design
+API endpointlar tekshirish
+Error handling
+Performance optimizatsiya
+Security updates
+Testing va debug
+Unit testlar
+Integration testlar
+User acceptance testing
+🧠 AI Agentga Beriladigan Buyruq:
+"Siz endi BotFactory platformasini tubdan qayta qurishingiz kerak. Loyiha yaratilgan, lekin dizayn va funksionallik qoniqarsiz. Mobile app style UI/UX dizayn qiling, Telegram integratsiyani to'g'rilang, bilimlar bazasi ishlashini ta'minlang. Yuqoridagi talablarga asoslanib, loyihani professional darajada qayta yozing. Boshlang: UI/UX dizayn qilishdan va telegram_service.py faylini to'g'rilashdan." 
