@@ -72,13 +72,23 @@
             </a>
             {% endif %}
             
-            <a href="{{ url_for('dashboard.analytics') }}" class="quick-action animate-slide-in" style="animation-delay: 0.1s;">
+            {% if bots and bots|length > 0 %}
+            <a href="{{ url_for('dashboard.analytics', bot_id=bots[0].id) }}" class="quick-action animate-slide-in" style="animation-delay: 0.1s;">
                 <div class="action-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="action-title">View Analytics</div>
                 <div class="action-description">Track performance and user engagement</div>
             </a>
+            {% else %}
+            <a href="{{ url_for('dashboard.bot_create') }}" class="quick-action animate-slide-in" style="animation-delay: 0.1s;">
+                <div class="action-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-title">Create First Bot</div>
+                <div class="action-description">Start by creating your first bot</div>
+            </a>
+            {% endif %}
             
             <a href="{{ url_for('dashboard.profile') }}" class="quick-action animate-slide-in" style="animation-delay: 0.2s;">
                 <div class="action-icon" style="background: linear-gradient(135deg, var(--info-color), #1d4ed8);">
