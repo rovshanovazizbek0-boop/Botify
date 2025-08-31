@@ -39,6 +39,22 @@ TRANSLATIONS = {
         'enterprise_price': '$99/month',
         'select_plan': 'Select Plan',
         
+        # Feature Lists
+        'one_bot': '1 Bot',
+        'messages_per_day': '100 Messages/day',
+        'telegram_integration': 'Telegram Integration',
+        'basic_ai_features': 'Basic AI Features',
+        'twenty_bots': '20 Bots',
+        'unlimited_messages': 'Unlimited Messages',
+        'all_integrations': 'All Integrations',
+        'analytics_dashboard': 'Analytics Dashboard',
+        'team_collaboration_feature': 'Team Collaboration',
+        'unlimited_bots': 'Unlimited Bots',
+        'advanced_ai': 'Advanced AI (Gemini Pro)',
+        'priority_support': 'Priority Support',
+        'api_access': 'API Access',
+        'custom_integrations': 'Custom Integrations',
+        
         # Call to Action
         'cta_title': 'Ready to build your first AI chatbot?',
         'cta_subtitle': 'Join thousands of businesses already using BotFactory to automate their customer service.',
@@ -164,6 +180,22 @@ TRANSLATIONS = {
         'enterprise_price': '$99/месяц',
         'select_plan': 'Выбрать план',
         
+        # Feature Lists
+        'one_bot': '1 Бот',
+        'messages_per_day': '100 Сообщений/день',
+        'telegram_integration': 'Интеграция с Telegram',
+        'basic_ai_features': 'Базовые ИИ функции',
+        'twenty_bots': '20 Ботов',
+        'unlimited_messages': 'Неограниченные сообщения',
+        'all_integrations': 'Все интеграции',
+        'analytics_dashboard': 'Панель аналитики',
+        'team_collaboration_feature': 'Командная работа',
+        'unlimited_bots': 'Неограниченные боты',
+        'advanced_ai': 'Продвинутый ИИ (Gemini Pro)',
+        'priority_support': 'Приоритетная поддержка',
+        'api_access': 'Доступ к API',
+        'custom_integrations': 'Пользовательские интеграции',
+        
         # Call to Action
         'cta_title': 'Готовы создать своего первого ИИ-чатбота?',
         'cta_subtitle': 'Присоединяйтесь к тысячам компаний, уже использующих BotFactory для автоматизации клиентского сервиса.',
@@ -288,6 +320,22 @@ TRANSLATIONS = {
         'business_price': '$49/oy',
         'enterprise_price': '$99/oy',
         'select_plan': 'Rejani tanlash',
+        
+        # Feature Lists
+        'one_bot': '1 Bot',
+        'messages_per_day': '100 Xabar/kun',
+        'telegram_integration': 'Telegram integratsiyasi',
+        'basic_ai_features': 'Asosiy AI xususiyatlari',
+        'twenty_bots': '20 Bot',
+        'unlimited_messages': 'Cheksiz xabarlar',
+        'all_integrations': 'Barcha integratsiyalar',
+        'analytics_dashboard': 'Analitika paneli',
+        'team_collaboration_feature': 'Jamoa hamkorligi',
+        'unlimited_bots': 'Cheksiz botlar',
+        'advanced_ai': 'Ilg\'or AI (Gemini Pro)',
+        'priority_support': 'Ustuvor qo\'llab-quvvatlash',
+        'api_access': 'API kirish',
+        'custom_integrations': 'Maxsus integratsiyalar',
         
         # Call to Action
         'cta_title': 'Birinchi AI chatbotingizni yaratishga tayyormisiz?',
