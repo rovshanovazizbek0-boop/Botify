@@ -726,11 +726,15 @@ main {
     inset: 0;
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
-    display: flex;
+    display: none; /* Hide by default */
     align-items: center;
     justify-content: center;
-    z-index: 10;
+    z-index: 9999;
     border-radius: inherit;
+}
+
+.loading-overlay.show {
+    display: flex;
 }
 
 .spinner-premium {
@@ -830,6 +834,17 @@ button, .btn, a, input[type="submit"], input[type="button"] {
     pointer-events: auto !important;
     position: relative;
     z-index: 10;
+}
+
+/* Ensure no global overlays block interaction */
+body {
+    pointer-events: auto !important;
+}
+
+/* Remove any potential blocking overlays */
+body::before,
+body::after {
+    content: none !important;
 }
 
 /* Bootstrap Modal Fixes */

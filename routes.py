@@ -170,13 +170,6 @@ def bot_settings(bot_id):
         flash('Bot settings updated successfully!', 'success')
         return redirect(url_for('dashboard.bot_settings', bot_id=bot.id))
     
-    # Debug: Check form submission
-    if request.method == 'POST':
-        print(f"POST request received. Form data: {request.form}")
-        print(f"kb_form.validate_on_submit(): {kb_form.validate_on_submit()}")
-        print(f"kb_form.submit.data: {kb_form.submit.data}")
-        print(f"kb_form.errors: {kb_form.errors}")
-    
     if kb_form.validate_on_submit() and kb_form.submit.data:
         kb = KnowledgeBase()
         kb.title = kb_form.title.data

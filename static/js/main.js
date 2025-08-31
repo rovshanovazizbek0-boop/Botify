@@ -152,8 +152,8 @@ function handleFileUpload(file, uploadElement) {
 // Loading States
 function showLoading(element) {
     const loadingOverlay = document.createElement('div');
-    loadingOverlay.className = 'loading-overlay';
-    loadingOverlay.innerHTML = '<div class="spinner"></div>';
+    loadingOverlay.className = 'loading-overlay show';
+    loadingOverlay.innerHTML = '<div class="spinner-premium"></div>';
     
     element.style.position = 'relative';
     element.appendChild(loadingOverlay);
