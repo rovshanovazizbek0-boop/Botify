@@ -329,7 +329,7 @@
                 <h5 class="modal-title" id="addKnowledgeModalLabel">{{ t.add_knowledge }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1080;"></button>
             </div>
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" action="{{ url_for('dashboard.bot_settings', bot_id=bot.id) }}" enctype="multipart/form-data">
                 {{ kb_form.hidden_tag() }}
                 <div class="modal-body">
                     <div class="mb-3">
