@@ -43,13 +43,16 @@ class KnowledgeBaseForm(FlaskForm):
     file_upload = FileField('Upload File', validators=[FileAllowed(['txt', 'pdf', 'doc', 'docx'])])
     submit = SubmitField('Add to Knowledge Base')
     
-    def validate(self):
-        if not super().validate():
+    def validate(self, extra_validators=None):
+        if not super().validate(extra_validators):
             return False
         
         # Either content or file must be provided
         if not self.content.data and not self.file_upload.data:
-            self.content.errors.append('Either content or file upload is required.')
+            if hasattr(self.content.errors, 'append'):
+                self.content.errors.append('Either content or file upload is required.')
+            else:
+                self.content.errors = list(self.content.errors) + ['Either content or file upload is required.']
             return False
         
         return True
